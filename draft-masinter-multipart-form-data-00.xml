@@ -8,12 +8,12 @@
   <!ENTITY rfc.1867 PUBLIC '' 'reference.RFC.1867.xml'>
   <!ENTITY rfc.2183 PUBLIC '' 'reference.RFC.2183.xml'>
   <!ENTITY rfc.2184 PUBLIC '' 'reference.RFC.2184.xml'>
-
+  <!ENTITY rfc.2388 PUBLIC '' 'reference.RFC.2388.xml'>
   <!ENTITY w3c.html5 PUBLIC '' 'reference.W3C.CR-html5-20121217.xml'>
 ]>
 
 <rfc ipr='trust200902' docName='draft-masinter-multipart-form-data-00'
-     obsoletes='2388'
+     obsoletes='2388' category='std'
      >
   <?xml-stylesheet type="text/xsl" href="rfc2629.xslt" ?>
   <?rfc toc="yes" ?>
@@ -24,7 +24,7 @@
   <front>
     <title abbrev="multipart/form-data">Returning Values from Forms:
     multipart/form-data</title>
-    <author initials="L.M."
+    <author initials="L."
 	    surname="Masinter"
 	    fullname="Larry Masinter">
       <organization>Adobe</organization>
@@ -63,6 +63,7 @@
 	via HTTP or electronic mail. This representation is widely
 	implemented in numerous web browsers and web servers.
       </t>
+      
       <t>
 	However, multipart/form-data can be used for forms that are
 	presented using representations other than HTML (spreadsheets,
@@ -99,11 +100,13 @@
 	"Content-Type", which defaults to "text/plain".  If the
 	contents of a file are returned via filling out a form, then
 	the file input is identified as the appropriate media type, if
-	known, or "application/octet-stream".  If multiple files are
-	to be returned as the result of a single form entry, they
-	should be represented as a "multipart/mixed" part embedded
-	within the "multipart/form-data".
+	known, or "application/octet-stream".  
+	
+	The inclusion of multiple files returned for a single 
+        file input result in multiple parts, one for each file,
+        with the same name.
       </t>
+
       <t>
 	Each part may be encoded and the "content-transfer-encoding"
 	header supplied if the value of that part does not conform to
@@ -164,6 +167,10 @@
 	</t>
       </section>
       <section title="Charset of text in form data">
+        <t>HTML forms have the convention that the value of a form entry
+           with entry name "_charset_" and type "hidden" is
+           automatically replaced with the name of the character
+           set used for encoding.</t>
 	<t>
 	  Each part of a multipart/form-data is supposed to have a
 	  content- type.  In the case where a field element is text,
@@ -192,25 +199,34 @@
 	application that is generating the form-data.
 	</t>
       </section>
-      <section title="Non-ASCII field names" anchor="non-ascii-fields">
+      <section title="Non-ASCII field names and values" anchor="non-ascii-fields">
 	<t>
-	  Note that MIME headers are generally required to consist
-	  only of 7- bit data in the US-ASCII character set. Hence
-	  field names should be encoded according to the method in
+	  Ordinarily MIME headers are generally required to consist
+	  only of 7- bit data in the US-ASCII character set. 
+          While <xref target="RFC2388"/> suggested that non-ASCII
+          field names should be encoded according to the method in
 	  <xref target="RFC2047"/> if they contain characters outside
-	  of that set.
+	  of US-ASCII, practice varies widely.
 	</t>
+        <t>Those creating forms SHOULD avoid non-ASCII field names,
+              for interoperability reasons. Field names are generally
+              not visible and should not be translated.</t>
+	<t>When encoding the result of filling a form, the results
+         may be expected differently according to the encoding
+        used in the original form.</t>
       </section>
       <section title="Ordered fields and duplicated field names">
 	<t>
 	  The relationship of the ordering of fields within a form and
 	  the ordering of returned values within "multipart/form-data"
-	  is not defined by this specification, nor is the handling of
-	  the case where a form has multiple fields with the same
-	  name. While HTML-based forms may send back results in the
-	  order received, and intermediaries should not reorder the
-	  results, there are some systems which might not define a
-	  natural order for form fields.
+	  was not defined by <xref target="RFC2388"/>, nor was the
+	  handling of the case where a form has multiple fields with
+	  the same name. Form processors given forms with a
+	  well-defined ordering SHOULD send back results in the order
+	  received and preserve duplicate field names, in order.
+	  Intermediaries MUST NOT reorder the results.(Note that
+	  there are some forms which do not define a natural order
+          of appearance.
 	</t>
       </section>	
       <section title="Interoperability with web applications">
@@ -318,6 +334,7 @@
       
     </references>
     <references title="Informative References">
+      &rfc.2388;
       <reference anchor="HTML3.2" target="http://www.w3.org/TR/REC-html32-19970114">
 	<front>
 	  <title>HTML 3.2 Reference Specification</title>
@@ -365,6 +382,13 @@
 	<format type="HTML" target="http://www.w3.org/TR/REC-html40-971218"/>
       </reference>
     </references>
+    <section title="Changes from RFC ">
+      <t> Multiple files submitted as part of a single &lt;input
+      type=file multiple&gt; element will result in each file having
+      its own field; the "sets of files" feature ("multipart/mixed")
+      in 2388 is not used.</t>
+      <t>document _charset_ convention.</t>
+    </section>
     <section title="Alternatives">
       <section title="Other data encodings rather than multipart">
 	<t>
