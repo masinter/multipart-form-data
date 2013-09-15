@@ -388,6 +388,8 @@
       its own field; the "sets of files" feature ("multipart/mixed")
       in 2388 is not used.</t>
       <t>document _charset_ convention.</t>
+      <t>Be more proscriptive about order and duplicates.</t>
+
     </section>
     <section title="Alternatives">
       <section title="Other data encodings rather than multipart">

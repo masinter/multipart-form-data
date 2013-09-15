@@ -51,35 +51,81 @@ Copyright Notice
 
 Table of Contents
 
-   1.  Introduction . . . . . . . . . . . . . . . . . . . . . . . . .  2
-   2.  Definition of multipart/form-data  . . . . . . . . . . . . . .  2
+   1.  Introduction
+   2.  Definition of multipart/form-data
+   3.  Use of multipart/form-data
+     3.1.  Boundary
+     3.2.  Sets of files
+     3.3.  Encoding
+     3.4.  Other attributes
+     3.5.  Charset of text in form data
+   4.  Operability considerations
+     4.1.  Compression, encryption
+     4.2.  Non-ASCII field names and values
+     4.3.  Ordered fields and duplicated field names
+     4.4.  Interoperability with web applications
+     4.5.  Correlating form data with the original form
+   5.  Security Considerations
+   6.  Media type registration for multipart/form-data
+   7.  References
+     7.1.  Normative References
+     7.2.  Informative References
+   Appendix A. Changes from RFC
+   Appendix B. Alternatives
+     Appendix B.1.  Other data encodings rather than multipart
+     Appendix B.2.  Remote files with third-party transfer
+   Author's Address
 
-Masinter                 Expires March 17, 2014                 [Page 1]
-
-Internet-Draft            multipart/form-data             September 2013
 
-   3.  Use of multipart/form-data . . . . . . . . . . . . . . . . . .  3
-     3.1.  Boundary . . . . . . . . . . . . . . . . . . . . . . . . .  3
-     3.2.  Sets of files  . . . . . . . . . . . . . . . . . . . . . .  3
-     3.3.  Encoding . . . . . . . . . . . . . . . . . . . . . . . . .  3
-     3.4.  Other attributes . . . . . . . . . . . . . . . . . . . . .  3
-     3.5.  Charset of text in form data . . . . . . . . . . . . . . .  4
-   4.  Operability considerations . . . . . . . . . . . . . . . . . .  4
-     4.1.  Compression, encryption  . . . . . . . . . . . . . . . . .  4
-     4.2.  Non-ASCII field names and values . . . . . . . . . . . . .  4
-     4.3.  Ordered fields and duplicated field names  . . . . . . . .  5
-     4.4.  Interoperability with web applications . . . . . . . . . .  5
-     4.5.  Correlating form data with the original form . . . . . . .  5
-   5.  Security Considerations  . . . . . . . . . . . . . . . . . . .  5
-   6.  Media type registration for multipart/form-data  . . . . . . .  6
-   7.  References . . . . . . . . . . . . . . . . . . . . . . . . . .  6
-     7.1.  Normative References . . . . . . . . . . . . . . . . . . .  6
-     7.2.  Informative References . . . . . . . . . . . . . . . . . .  7
-   Appendix A. Changes from RFC . . . . . . . . . . . . . . . . . . .  7
-   Appendix B. Alternatives . . . . . . . . . . . . . . . . . . . . .  8
-     Appendix B.1.  Other data encodings rather than multipart  . . .  8
-     Appendix B.2.  Remote files with third-party transfer  . . . . .  8
-   Author's Address . . . . . . . . . . . . . . . . . . . . . . . . .  8
+
+
+Network Working Group                                        L. Masinter
+Internet-Draft                                                     Adobe
+Obsoletes: 2388 (if approved)                         September 15, 2013
+Intended status: Standards Track
+Expires: March 17, 2014
+
+            Returning Values from Forms: multipart/form-data
+                 draft-masinter-multipart-form-data-00
+
+Abstract
+
+   This specification defines an Internet Media Type, multipart/form-
+   data, which can be used by a wide variety of applications and
+   transported by a wide variety of protocols as a way of returning a
+   set of values as the result of a user filling out a form.  It
+   replaces RFC 2388.
+
+Status of this Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at http://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on March 17, 2014.
+
+Copyright Notice
+
+   Copyright (c) 2013 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (http://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Simplified BSD License text
+   as described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Simplified BSD License.
 
 1.  Introduction
 
@@ -108,17 +154,6 @@ Internet-Draft            multipart/form-data             September 2013
    MIME data streams as outlined in [RFC2046].  In forms, there are a
    series of fields to be supplied by the user who fills out the form.
    Each field has a name.  Within a given form, the names are unique.
-
-
-
-
-
-
-
-Masinter                 Expires March 17, 2014                 [Page 2]
-
-Internet-Draft            multipart/form-data             September 2013
-
 
    "multipart/form-data" contains a series of parts.  Each part MUST
    contain a content-disposition header [RFC2183] where the disposition
@@ -171,14 +206,6 @@ Internet-Draft            multipart/form-data             September 2013
 
 3.4.  Other attributes
 
-
-
-
-Masinter                 Expires March 17, 2014                 [Page 3]
-
-Internet-Draft            multipart/form-data             September 2013
-
-
    Forms may request file inputs from the user; the form software may
    include the file name and other file attributes, as specified in
    [RFC2184].
@@ -229,14 +256,6 @@ Internet-Draft            multipart/form-data             September 2013
    Ordinarily MIME headers are generally required to consist only of 7-
    bit data in the US-ASCII character set.  While [RFC2388] suggested
    that non-ASCII field names should be encoded according to the method
-
-
-
-
-Masinter                 Expires March 17, 2014                 [Page 4]
-
-Internet-Draft            multipart/form-data             September 2013
-
    in [RFC2047] if they contain characters outside of US-ASCII, practice
    varies widely.
 
@@ -287,15 +306,6 @@ Internet-Draft            multipart/form-data             September 2013
    to be transmitted back to the form-data processor.)
 
 5.  Security Considerations
-
-
-
-
-
-Masinter                 Expires March 17, 2014                 [Page 5]
-
-Internet-Draft            multipart/form-data             September 2013
-
 
    The data format described in this document introduces no new security
    considerations outside of those introduced by the protocols that use
@@ -348,13 +358,6 @@ Internet-Draft            multipart/form-data             September 2013
 7.  References
 
 7.1.  Normative References
-
-
-
-Masinter                 Expires March 17, 2014                 [Page 6]
-
-Internet-Draft            multipart/form-data             September 2013
-
 
    [RFC1806]  Troost, R. and S. Dorner, "Communicating Presentation
               Information in Internet Messages: The Content-Disposition
@@ -410,11 +413,6 @@ Appendix A.  Changes from RFC
 
    document _charset_ convention.
 
-Masinter                 Expires March 17, 2014                 [Page 7]
-
-Internet-Draft            multipart/form-data             September 2013
-
-
    Be more proscriptive about order and duplicates.
 
 Appendix B.  Alternatives
@@ -454,18 +452,3 @@ Author's Address
    Email: masinter@adobe.com
    URI:   http://larry.masinter.net
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Masinter                 Expires March 17, 2014                 [Page 8]
