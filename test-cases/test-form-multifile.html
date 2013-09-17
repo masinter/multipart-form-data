@@ -1,0 +1,10 @@
+<!DOCTYPE HTML>
+<title>multipart/form-data and multiple files</title>
+<h1>Form submission multiple file tests</h1>
+<p>CONTROL: Expected result: <span id="expected">multiple entries</span>
+ <p>Result should have multiple entries for "file"</p>
+<h2>Enter multiple (small) file:</h2>
+<form action="http://software.hixie.ch/utilities/cgi/test-tools/echo" method="post" enctype="multipart/form-data">
+ <input type=file multiple="multiple">
+ <input type=submit>
+</form>

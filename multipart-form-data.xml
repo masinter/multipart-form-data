@@ -63,7 +63,7 @@
 	The definition of multipart/form-data is derived from one of
 	those applications, originally set out in <xref
 	target="RFC1867"/> and subsequently incorporated into <xref
-	target="HTML3.2"/> and <xref target="HTML4.0"/>, where forms
+	target="HTML3.2"/> and <xref target="HTML4"/>, where forms
 	are expressed in HTML, and in which the form values are sent
 	via HTTP or electronic mail. This representation is widely
 	implemented in numerous web browsers and web servers.
@@ -105,11 +105,15 @@
 	"Content-Type", which defaults to "text/plain".  If the
 	contents of a file are returned via filling out a form, then
 	the file input is identified as the appropriate media type, if
-	known, or "application/octet-stream".  
-	
-	The inclusion of multiple files returned for a single 
-        file input result in multiple parts, one for each file,
-        with the same name.
+	known, or "application/octet-stream". 
+      </t>
+      <t>
+	The handling of file input fields that allow multiple files to
+	be specified varies between browsers.  Some send these as sets
+	of files (wrapping all the parts for the files in one
+	multipart/mixed), some just send multiple form-data parts with
+	the same "name" attribute.  HTML5 specifies the latter
+	behavior.
       </t>
 
       <t>
@@ -192,6 +196,7 @@
 	  content-disposition: form-data; name="field1"
 	  content-type: text/plain;charset=windows-1250
 	  content-transfer-encoding: quoted-printable
+	    
 	  Joe owes =80100.
 	  --AaB03x
 	</artwork></figure>
@@ -417,7 +422,7 @@
 	<seriesInfo name="World Wide Web Consortium Recommendation" value="REC-html32-19970114"/>
 	<format type="HTML" target="http://www.w3.org/TR/REC-html32-19970114"/>
       </reference>
-      <reference anchor="HTML4.0" target="http://www.w3.org/TR/REC-html40-971218">
+      <reference anchor="HTML4" target="http://www.w3.org/TR/REC-html40-971218">
 	<front>
 	  <title>HTML 4.0 Recommendation</title>
 	  <author initials="D." surname="Raggett" fullname="David Raggett">
@@ -435,23 +440,6 @@
 	<format type="HTML" target="http://www.w3.org/TR/REC-html40-971218"/>
       </reference>
 
-      <reference anchor="html4" target="http://www.w3.org/TR/REC-html40-971218">
-	<front>
-	  <title>HTML 4.0 Recommendation</title>
-	  <author initials="D." surname="Raggett" fullname="David Raggett">
-	    <organization/>
-	  </author>
-	  <author initials="A." surname="Hors" fullname="Arnaud Le Hors">
-	    <organization/>
-	  </author>
-	  <author initials="I." surname="Jacobs" fullname="Ian Jacobs">
-	    <organization/>
-	  </author>
-	  <date month="December" day="18" year="1997"/>
-	</front>
-	<seriesInfo name="World Wide Web Consortium" value="REC-html40-971218"/>
-	<format type="HTML" target="http://www.w3.org/TR/REC-html40-971218"/>
-      </reference>
     </references>
     <section title="Changes from RFC 2388">
       <t>Now, multiple files submitted as part of a single &lt;input
@@ -468,7 +456,7 @@
       was not defined before, nor was the
       handling of the case where a form has multiple fields with
       the same name. </t>
-      <t>More proscriptive about order and duplicates.</t>
+      <t>More prescriptive about order and duplicates.</t>
       <t>Remove obsolete discussion of alternatives.</t>
     </section>
     <section title="Alternatives">
