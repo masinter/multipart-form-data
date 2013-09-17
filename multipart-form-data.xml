@@ -461,7 +461,7 @@
     </section>
     <section title="Alternatives">
       <t>There are numerous alternative ways in which form data
-      can be encoded; many are listed in <xref target="HTML5"/>
+      can be encoded; many are listed in <xref target="RFC2388"/>
       under "Other data encodings rather than multipart".
       The multipart/form-data encoding has a high overhead and
       performance impact if there are many fields with short
