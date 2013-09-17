@@ -12,7 +12,7 @@
   <!ENTITY w3c.html5 PUBLIC '' 'reference.W3C.CR-html5-20121217.xml'>
 ]>
 
-<rfc ipr='trust200902' docName='draft-masinter-multipart-form-data-00'
+<rfc ipr='trust200902' docName='draft-masinter-multipart-form-data-01'
      obsoletes='2388' category='std'
      >
   <?xml-stylesheet type="text/xsl" href="rfc2629.xslt" ?>
@@ -43,6 +43,11 @@
 	It replaces RFC 2388.
       </t>
     </abstract>
+    <note title="NOTE">
+      <t>The Currently, XML source for this Internet Draft may be found in
+      <eref target="https://github.com/masinter/multipart-form-data"/>, 
+      as well as an issue tracker.</t>
+    </note>
   </front>
   <middle>
     <section title="Introduction">
@@ -208,25 +213,65 @@
 	  <xref target="RFC2047"/> if they contain characters outside
 	  of US-ASCII, practice varies widely.
 	</t>
-        <t>Those creating forms SHOULD avoid non-ASCII field names,
-              for interoperability reasons. Field names are generally
-              not visible and should not be translated.</t>
-	<t>When encoding the result of filling a form, the results
-         may be expected differently according to the encoding
-        used in the original form.</t>
+	<t>This specification makes three recommendations for
+	   three different states of workflow.</t>
+	<section title="Creating forms with non-ASCII field names">
+          <t>In general, those creating forms SHOULD avoid non-ASCII
+          field names, for interoperability reasons. This should not
+          be a burden, because in general the field names are not
+          visible to users.</t>
+        </section>
+	<section title="Interpreting forms and creating form-data">
+	  <t>Some applications of this specification will supply a
+	  character encoding to be used for creation of the
+	  multipart/form-data result.  In particular, note that <xref
+	  target="HTML5"/> uses
+	    <list style='numbers'>
+	      <t>the value of an accept-charset attribute of
+	      the &lt;form&gt; element, if there is one</t>
+	      <t>the character encoding of the document containing
+	      the form, if it is ASCII compatible</t>
+	      <t>otherwise UTF-8</t>
+	    </list>
+	  </t>
+	  <t>It is conventional that when encoding the result of
+	  filling a form, if there is a "hidden" field named
+	  <spanx style='verb'>_charset_</spanx>, the value of the
+	  field SHOULD be replaced with the name of form-data encoding
+	  charset.
+	  </t>
+	</section>
+	<section title="Parsing and interpreting form data">
+	  <t> 
+            As currently deployed, browsers differ as to how they
+            encode multipart/form-data. For this reason the matching
+            of form elements to form-data parts may rely on a fuzzier
+            match.  In particular, some form interpreters might have
+            followed the advice of <xref target="RFC2388"/> and used
+            the <xref target="RFC2047"/> "encoded-word" method of
+            encoding non-ASCII values:
+	    <figure><artwork>
+     encoded-word = "=?" charset "?" encoding "?" encoded-text "?=" 
+	    </artwork></figure>
+	  </t>
+          <t>
+	    Generally, interpreting multipart/form-data
+	    will require knowing the charset used in form encoding.
+	    The use of the <spanx style='verb'>_charset_</spanx>
+	    element convention provides that information.
+	    
+          </t>
+
+	</section>
       </section>
       <section title="Ordered fields and duplicated field names">
 	<t>
-	  The relationship of the ordering of fields within a form and
-	  the ordering of returned values within "multipart/form-data"
-	  was not defined by <xref target="RFC2388"/>, nor was the
-	  handling of the case where a form has multiple fields with
-	  the same name. Form processors given forms with a
+	  Form processors given forms with a
 	  well-defined ordering SHOULD send back results in the order
 	  received and preserve duplicate field names, in order.
 	  Intermediaries MUST NOT reorder the results.(Note that
 	  there are some forms which do not define a natural order
-          of appearance.
+          of appearance.)
 	</t>
       </section>	
       <section title="Interoperability with web applications">
@@ -239,7 +284,7 @@
 	  name=Xavier+Xantico&amp;verdict=Yes&amp;colour=Blue&amp;happy=sad&amp;Utf%F6r=Send
 	</artwork></figure>
 	<t>
-	  however, there is no opportunity to label the enclosed
+	  However, there is no opportunity to label the enclosed
 	  data with content type, apply a charset, or use other
 	  encoding mechanisms.
 	</t>
@@ -335,6 +380,32 @@
     </references>
     <references title="Informative References">
       &rfc.2388;
+      <reference anchor='HTML5'
+		 target='http://www.w3.org/html/wg/drafts/html/CR/'>
+	<front>
+	  <title>HTML5</title>
+	  <author initials='R.' surname='Berjon' fullname='Robin Berjon'>
+	    <organization />
+	  </author>
+	  <author initials='S.' surname='Faulkner'>
+	    <organization />
+	  </author>
+	  <author initials='T.' surname='Leithead' fullname='Travis Leithead'>
+	    <organization />
+	  </author>
+	  <author initials='E.' surname='Navara' fullname='Erika Doyle Navara'>
+	    <organization />
+	  </author>
+	  <author initials='E.' surname='O&apos;Connor' fullname='Edward O&apos;Connor'>
+	    <organization />
+	  </author>
+	  <author initials='S.' surname='Pfeiffer' fullname='Silvia Pfeiffer'>
+	    <organization />
+	  </author>
+	  <date month='September' day='17' year='2013' />
+	</front>
+      </reference>	    
+	    
       <reference anchor="HTML3.2" target="http://www.w3.org/TR/REC-html32-19970114">
 	<front>
 	  <title>HTML 3.2 Reference Specification</title>
@@ -382,48 +453,33 @@
 	<format type="HTML" target="http://www.w3.org/TR/REC-html40-971218"/>
       </reference>
     </references>
-    <section title="Changes from RFC ">
-      <t> Multiple files submitted as part of a single &lt;input
+    <section title="Changes from RFC 2388">
+      <t>Now, multiple files submitted as part of a single &lt;input
       type=file multiple&gt; element will result in each file having
       its own field; the "sets of files" feature ("multipart/mixed")
       in 2388 is not used.</t>
-      <t>document _charset_ convention.</t>
-      <t>Be more proscriptive about order and duplicates.</t>
-
+      <t>The _charset_ convention and use of an explicit
+      encoding charset is documented.</t>
+      <t>Explicit advice about non-ASCII field names is given,
+      the use of RFC 2047 is deprecated (not used for encoding,
+      but form interpreters should be aware.).</t>
+      <t>The relationship of the ordering of fields within a form and
+      the ordering of returned values within "multipart/form-data"
+      was not defined before, nor was the
+      handling of the case where a form has multiple fields with
+      the same name. </t>
+      <t>More proscriptive about order and duplicates.</t>
+      <t>Remove obsolete discussion of alternatives.</t>
     </section>
     <section title="Alternatives">
-      <section title="Other data encodings rather than multipart">
-	<t>
-	  Various people have suggested using new mime top-level type
-	  "aggregate", e.g., aggregate/mixed or a
-	  content-transfer-encoding of "packet" to express
-	  indeterminate-length binary data, rather than relying on the
-	  multipart-style boundaries. While this would be useful, the
-	  "multipart" mechanisms are well established, simple to
-	  implement on both the sending client and receiving server,
-	  and as efficient as other methods of dealing with multiple
-	  combinations of binary data.
-	</t>
-	<t>
-	  The multipart/form-data encoding has a high overhead and
-	  performance impact if there are many fields with short
-	  values. However, in practice, for the forms in use, for
-	  example, in HTML, the average overhead is not significant.
-	</t>
-      </section>
-      <section title="Remote files with third-party transfer">
-	<t>
-	  In some scenarios, the user operating the form software
-	  might want to specify a URL for remote data rather than a
-	  local file. In this case, is there a way to allow the
-	  browser to send to the client a pointer to the external data
-	  rather than the entire contents? This capability could be
-	  implemented, for example, by having the client send to the
-	  server data of type "message/external-body" with
-	  "access-type" set to, say, "uri", and the URL of the remote
-	  data in the body of the message.
-	</t>
-      </section>
+      <t>There are numerous alternative ways in which form data
+      can be encoded; many are listed in <xref target="HTML5"/>
+      under "Other data encodings rather than multipart".
+      The multipart/form-data encoding has a high overhead and
+      performance impact if there are many fields with short
+      values. However, in practice, for the forms in use, for
+      example, in HTML, the average overhead is not significant.
+      </t>
     </section>
   </back>
 </rfc>
