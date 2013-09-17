@@ -1,3 +1,5 @@
-*.txt
-draft*.html
-*.pdf
+# ignore output of xml2rfc conversion
+# plain text conversions
+multi*.txt
+multi*.html
+multi*.pdf
