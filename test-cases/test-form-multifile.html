@@ -4,7 +4,12 @@
 <p>CONTROL: Expected result: <span id="expected">multiple entries</span>
  <p>Result should have multiple entries for "file"</p>
 <h2>Enter multiple (small) file:</h2>
-<form action="http://software.hixie.ch/utilities/cgi/test-tools/echo" method="post" enctype="multipart/form-data">
- <input type=file multiple="multiple">
+
+
+
+<form action="http://www.posttestserver.com/post.php?dump&html&dir=multipart-test" method="post" enctype="multipart/form-data">
+ 
+ <input type=file multiple="multiple" size=40 name="submitted">
+ <input type=hidden name=test value=text>
  <input type=submit>
 </form>

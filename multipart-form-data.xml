@@ -80,113 +80,80 @@
     </section>
     <section title="Definition of multipart/form-data">
       <t>
-	The media-type multipart/form-data follows the rules of all
-	multipart MIME data streams as outlined in <xref
-	target='RFC2046'/>.  In forms, there are a series of fields to
-	be supplied by the user who fills out the form.  Each field
-	has a name. Within a given form, the names are unique.
+	The media-type multipart/form-data generally follows the model
+	of multipart MIME data streams as described in <xref
+	target='RFC2046'/> Section 5.1.
       </t>
       <t>
-	"multipart/form-data" contains a series of parts. Each part 
-	MUST contain a content-disposition header <xref
+	In forms, there are a series of fields to be supplied by the
+	user who fills out the form.  Each field has a name. Within a
+	given form, the names SHOULD be unique. After a form
+	has been "filled out" and "submitted" (processes defined
+	by the form), the result is a set of values for each field,
+	the form-data. 
+      </t>
+      <t>
+	"multipart/form-data" contains a series of parts. Each part
+	MUST contain a Content-Disposition header <xref
 	target='RFC2183'/> where the disposition type is "form-data",
 	and where the disposition contains an (additional) parameter
-	of "name", where the value of that parameter is the original
-	field name in the form. For example, a part might contain a
+	of "name"; the value of the parameter is the original
+	field name in the form.  For example, a part might contain a
 	header:
-      </t>
       <figure><artwork>
         Content-Disposition: form-data; name="user"
       </artwork></figure>
-      <t>with the value corresponding to the entry of the "user" field.
+      with the value corresponding to the entry of the "user" field.
       </t>
-      <t>
-	As with all multipart MIME types, each part has an optional
-	"Content-Type", which defaults to "text/plain".  If the
-	contents of a file are returned via filling out a form, then
-	the file input is identified as the appropriate media type, if
-	known, or "application/octet-stream". 
-      </t>
-      <t>
-	The handling of file input fields that allow multiple files to
-	be specified varies between browsers.  Some send these as sets
-	of files (wrapping all the parts for the files in one
-	multipart/mixed), some just send multiple form-data parts with
-	the same "name" attribute.  HTML5 specifies the latter
-	behavior.
-      </t>
-
-      <t>
-	Each part may be encoded and the "content-transfer-encoding"
-	header supplied if the value of that part does not conform to
-	the default encoding.
-      </t>
-    </section>
-    <section title="Use of multipart/form-data">
       <section title="Boundary">
 	<t>
-	  As with other multipart types, a boundary is selected that
-	  does not occur in any of the data. Each field of the form is
-	  sent, in the order defined by the sending appliction and
-	  form, as a part of the multipart stream.  Each part
-	  identifies the INPUT name within the original form. Each
-	  part should be labelled with an appropriate content-type if
-	  the media type is known (e.g., inferred from the file
-	  extension or operating system typing information) or as
-	  "application/octet-stream".
+	  As with other multipart types, the parts are delimited with
+	  a boundary, selected such that it does not occur in any of
+	  the data. Each field of the form is sent, in the order
+	  defined by the sending application and form, as a part of the
+	  multipart stream. The boundary is supplied as a "boundary"
+	  parameter to the multipart/form-data type, e.g.,
+	  <figure><artwork>
+	    multipart/form-data;boundary="-AaB03x"
+	  </artwork></figure>
 	</t>
       </section>
-      <section title="Sets of files">
+      
+      <section title="filename attribute">
+	<t>
+	  For form data that represents the content of a local file,
+	  the original local file name may be supplied as as well, as a
+	  "filename" parameter of the Content-Distribution header.  If
+	  the file name of the sender's operating system is not in
+	  US-ASCII, the file name MAY be approximated.  This is a
+	  convenience for those cases where the files supplied by the
+	  form might contain references to each other, e.g., a TeX file
+	  and its .sty auxiliary style description.
+	</t>
+      </section>
+	  
+      <section title="Multiple files for one form field">
 	<t>
 	  If the value of a form field is a set of files rather than a
-	  single file, that value can be transferred together using
-	  the "multipart/mixed" format.
+	  single file, that value MUST be transmitted by supplying
+	  each in a separate part, but all with the same "name"
+	  parameter. 
 	</t>
       </section>
-      <section title="Encoding">
+	
+      <section title="Content-Type">
 	<t>
-	  While the HTTP protocol can transport arbitrary binary data,
-	  the default for mail transport is the 7BIT encoding.  The
-	  value supplied for a part may need to be encoded and the
-	  "content-transfer-encoding" header supplied if the value
-	  does not conform to the default encoding.  [See section 5 of
-	  <xref target="RFC2046"/> for more details.]
+	  Each part has an (optional) "Content-Type", which defaults
+	  to "text/plain". If the contents of a file are to be sent,
+	  the file data is labeled with an appropriate media type, if
+	  known, or "application/octet-stream".
 	</t>
       </section>
-      <section title="Other attributes">
+      <section title="The charset parameter">
 	<t>
-	  Forms may request file inputs from the user; the form
-	  software may include the file name and other file
-	  attributes, as specified in <xref target="RFC2184"/>.
-	</t>
-	<t>
-	  The original local file name may be supplied as well, either
-	  as a "filename" parameter either of the
-	  "content-disposition: form-data" header or, in the case of
-	  multiple files, in a "content-disposition: file" header of
-	  the subpart. The sending application MAY supply a file name;
-	  if the file name of the sender's operating system is not in
-	  US-ASCII, the file name might be approximated, or encoded
-	  using the method of <xref target="RFC2231"/>.
-	</t>
-	<t>
-	  This is a convenience for those cases where the files
-	  supplied by the form might contain references to each other,
-	  e.g., a TeX file and its .sty auxiliary style description.
-	</t>
-      </section>
-      <section title="Charset of text in form data">
-        <t>HTML forms have the convention that the value of a form entry
-           with entry name "_charset_" and type "hidden" is
-           automatically replaced with the name of the character
-           set used for encoding.</t>
-	<t>
-	  Each part of a multipart/form-data is supposed to have a
-	  content- type.  In the case where a field element is text,
-	  the charset parameter for the text indicates the character
-	  encoding used.
-	</t>
-	<t>
+	  In the case where a field value is text
+	  the charset parameter for the Content-Type: text/plain
+	  may be used to indicate the character encoding used in that part.
 	  For example, a form with a text field in which a user typed
 	  'Joe owes &lt;eu&gt;100' where &lt;eu&gt; is the Euro symbol
 	  might have form data returned as:
@@ -201,54 +168,90 @@
 	  --AaB03x
 	</artwork></figure>
       </section>
-    </section>
-    <section title="Operability considerations">
-      <section title="Compression, encryption">
-	<t>Some of the data in forms may be compressed or encrypted,
-	using other MIME mechanisms. This is a function of the
-	application that is generating the form-data.
+	
+      <section title="The _charset_ field">
+        <t>Forms have the convention that the value of a form entry
+        with entry name "_charset_" and type "hidden" is automatically
+        set to the name of the form-charset. In this case, the value
+        of the default charset of each text/plain part without a
+        charset parameter is the supplied value.</t>
+      </section>
+
+      <section title="Content-Transfer-Encoding">
+	<t>
+	  When used in transports which do not allow
+	  arbitrary binary data, each part that cannot be represented
+	  within the transport SHOULD be encoded and the
+	  "content-transfer-encoding" header supplied in that part.
+	  For example, some email transports use a 7BIT
+	  encoding. [See section 5 of <xref target="RFC2046"/> for
+	  more details.]	  
+	  (When transferred via HTTP, Content-Transfer-Encoding
+	  the form-data values SHOULD NOT be used.)
 	</t>
       </section>
+      <section title="Other Content- headers">
+	<t>The multipart/form-data media type does not support any
+	MIME headers in the parts other than Content-Type,
+	Content-Disposition, and (when appropriate),
+	Content-Transfer-Encoding.
+	</t>
+      </section>
+    </section>
+	    
+    <section title="Operability considerations">
       <section title="Non-ASCII field names and values" anchor="non-ascii-fields">
 	<t>
-	  Ordinarily MIME headers are generally required to consist
-	  only of 7- bit data in the US-ASCII character set. 
+	  MIME headers in multipart/form-data are required to consist
+	  only of 7-bit data in the US-ASCII character set.
           While <xref target="RFC2388"/> suggested that non-ASCII
           field names should be encoded according to the method in
 	  <xref target="RFC2047"/> if they contain characters outside
-	  of US-ASCII, practice varies widely.
+	  of US-ASCII, practice varies.
 	</t>
 	<t>This specification makes three recommendations for
 	   three different states of workflow.</t>
-	<section title="Creating forms with non-ASCII field names">
-          <t>In general, those creating forms SHOULD avoid non-ASCII
-          field names, for interoperability reasons. This should not
-          be a burden, because in general the field names are not
-          visible to users.</t>
+	<section title="Avoid creating forms with non-ASCII field names">
+          <t>For broadest interoperability with existing deployed
+          software, those creating forms SHOULD avoid non-ASCII field
+          names. This should not be a burden, because in general the
+          field names are not visible to users.</t>
         </section>
 	<section title="Interpreting forms and creating form-data">
 	  <t>Some applications of this specification will supply a
 	  character encoding to be used for creation of the
-	  multipart/form-data result.  In particular, note that <xref
+	  multipart/form-data result. In particular, <xref
 	  target="HTML5"/> uses
-	    <list style='numbers'>
-	      <t>the value of an accept-charset attribute of
-	      the &lt;form&gt; element, if there is one</t>
-	      <t>the character encoding of the document containing
-	      the form, if it is ASCII compatible</t>
-	      <t>otherwise UTF-8</t>
-	    </list>
+	  <list style='symbols'>
+	    <t>the value of an accept-charset attribute of
+	    the &lt;form&gt; element, if there is one,</t>
+	    <t>the character encoding of the document containing
+	    the form, if it is US-ASCII compatible,</t>
+	    <t>otherwise UTF-8.</t>
+	  </list>
+	  Call this the form-charset.
+	  For each character in the entry's name that cannot be
+	  expressed using the form-charset, replace the
+	  character by a string consisting of an ampersand
+	  character (&amp;), a "#" character, one or more
+	  ASCII digits representing the Unicode code point of the
+	  character in base ten, and finally a semicolon
+	  character (;). The result is a US-ASCII surrogate.
 	  </t>
-	  <t>It is conventional that when encoding the result of
-	  filling a form, if there is a "hidden" field named
-	  <spanx style='verb'>_charset_</spanx>, the value of the
-	  field SHOULD be replaced with the name of form-data encoding
-	  charset.
+	  <t>multipart/form-data parts which do not have
+	  a Content-Type header and which are not the result
+	  of supplying a local file MUST be transformed by
+	  the same algorithm.
 	  </t>
 	</section>
+	    
 	<section title="Parsing and interpreting form data">
 	  <t> 
-            As currently deployed, browsers differ as to how they
+            While this specification provides guidance for
+	    creation of multipart/form-data, interpreters of
+	    multipart/form-data should be aware of the variety
+	    of implementations. 
+	    Currently, deployed browsers differ as to how they
             encode multipart/form-data. For this reason the matching
             of form elements to form-data parts may rely on a fuzzier
             match.  In particular, some form interpreters might have
@@ -261,16 +264,16 @@
 	  </t>
           <t>
 	    Generally, interpreting multipart/form-data
-	    will require knowing the charset used in form encoding.
-	    The use of the <spanx style='verb'>_charset_</spanx>
-	    element convention provides that information.
-	    
+	    will require knowing the charset used in form encoding,
+	    in cases where the _charset_ field value or a 
+	    charset parameter of a text/plain Content-Type
+	    header is not supplied.
           </t>
-
 	</section>
       </section>
       <section title="Ordered fields and duplicated field names">
 	<t>
+	    
 	  Form processors given forms with a
 	  well-defined ordering SHOULD send back results in the order
 	  received and preserve duplicate field names, in order.
@@ -315,13 +318,11 @@
       </t>
       </section>
     </section>
-    <section title="Security Considerations">
+    <section title="Security Considerations" anchor="security">
       <t>
-	The data format described in this document introduces no new
-	security considerations outside of those introduced by the
-	protocols that use it and of the component elements. It is
-	important when interpreting content-disposition to not
-	overwrite files in the recipients address space inadvertently.
+	It is important when interpreting the filename of the
+	Content-Disposition header to not overwrite files in the
+	recipients address space inadvertently.
       </t>
       <t>
 	User applications that request form information from users
@@ -347,29 +348,36 @@
       </t>
     </section>
     <section title="Media type registration for multipart/form-data">
-      <figure><artwork>
-	Media Type name:
+      <t>
+	<list style='hanging'>
+	<t hangText='Media Type name:'>
 	  multipart
-	Media subtype name:
+	</t>
+	<t hangText='Media subtype name:'>
 	  form-data
-        Required parameters:
+	</t>
+	<t hangText='Required parameters:'>
+	  boundary
+	</t>
+	<t hangText='Optional parameters:'>
 	   none
-	Optional parameters:
-	   none
-	Encoding considerations:
-	   No additional considerations other than as for other
-	   multipart types.
-	Security Considerations
+	</t>
+	<t hangText='Encoding considerations:'>
+	  multipart/form-data is frequently used to send
+	   arbitrary binary data. For use in transports that
+	   restrict the encoding to 7BIT or 8BIT, each part
+	   is encoded separately. 
+	</t>
+	<t hangText='Security Considerations'>
            Applications which receive forms and process them must be
            careful not to supply data back to the requesting form
            processing site that was not intended to be sent by the
            recipient. This is a consideration for any application that
            generates a multipart/form-data.
-
-	   The multipart/form-data type introduces no new security
-	   considerations for recipients beyond what might occur with
-	   any of the enclosed parts.
-      </artwork></figure>
+	   See <xref target="security"/> of this document.
+	</t>
+      </list>
+      </t>
     </section>
   </middle>
   <back>
