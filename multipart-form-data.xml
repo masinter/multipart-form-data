@@ -12,7 +12,7 @@
   <!ENTITY w3c.html5 PUBLIC '' 'reference.W3C.CR-html5-20121217.xml'>
 ]>
 
-<rfc ipr='trust200902' docName='draft-masinter-multipart-form-data-02'
+<rfc ipr='trust200902' docName='draft-ietf-appsawg-multipart-form-data-03'
      obsoletes='2388' category='std'
      >
   <?xml-stylesheet type="text/xsl" href="rfc2629.xslt" ?>
@@ -128,7 +128,7 @@
 	  drag-and-drop in systems where the file name is meaningless,
 	  private, where the uploaded 'file' is streamed directly
 	  from a device, where the file name is not user visible
-	  and thus would be unrecognized).
+	  and thus would be unrecognized.)
 	  For compatibility with other multipart types, the value
 	  of the filename parameter MUST be restricted to US-ASCII.
 	  File names normally visible to users which contain
@@ -188,7 +188,7 @@
 	  When used in transports which do not allow
 	  arbitrary binary data, each part that cannot be represented
 	  within the transport SHOULD be encoded and the
-	  "content-transfer-encoding" header supplied in that part.
+  Content-Transfer-Encoding header supplied in that part.
 	  For example, some email transports use a 7BIT
 	  encoding. [See section 5 of <xref target="RFC2046"/> for
 	  more details.]	  
@@ -381,7 +381,7 @@
 	   restrict the encoding to 7BIT or 8BIT, each part
 	   is encoded separately. 
 	</t>
-	<t hangText='Security Considerations'>
+	<t hangText='Security considerations:'>
            Applications which receive forms and process them must be
            careful not to supply data back to the requesting form
            processing site that was not intended to be sent by the
@@ -463,31 +463,47 @@
 
     </references>
     <section title="Changes from RFC 2388">
-      <t>Now, multiple files submitted as part of a single &lt;input
-      type=file multiple&gt; element will result in each file having
-      its own field; the "sets of files" feature ("multipart/mixed")
-      in 2388 is not used.</t>
-      <t>The _charset_ convention and use of an explicit
-      encoding charset is documented.</t>
-      <t>Explicit advice about non-ASCII field names is given,
-      the use of RFC 2047 is deprecated (not used for encoding,
-      but form interpreters should be aware.).</t>
+
+      <t>The handling of multiple files submitted as the result of a
+      single form field (e.g., HTML's &lt;input type=file multiple&gt;
+      element) results in each file having its own top level part with
+      the same name parameter; the method of using a nested
+      "multipart/mixed" from <xref target="RFC2388"/> is not
+      recommended.</t>
+
+      <t>The _charset_ convention and use of an explicit form-data
+      charset is documented.</t>
+
+      <t>The handling of non-ASCII field names is changed significantly.
+      Few if any implemented the =?charset:string?= method
+      of <xref target="RFC2047"/>.
+      </t>
+
       <t>The relationship of the ordering of fields within a form and
-      the ordering of returned values within "multipart/form-data"
-      was not defined before, nor was the
-      handling of the case where a form has multiple fields with
-      the same name. </t>
+      the ordering of returned values within "multipart/form-data" was
+      not defined before, nor was the handling of the case where a
+      form has multiple fields with the same name. </t>
+
       <t>More prescriptive about order and duplicates.</t>
+
       <t>Remove obsolete discussion of alternatives.</t>
+
+
     </section>
+
     <section title="Alternatives">
-      <t>There are numerous alternative ways in which form data
-      can be encoded; many are listed in <xref target="RFC2388"/>
-      under "Other data encodings rather than multipart".
-      The multipart/form-data encoding has a high overhead and
-      performance impact if there are many fields with short
-      values. However, in practice, for the forms in use, for
-      example, in HTML, the average overhead is not significant.
+      <t>There are numerous alternative ways in which form data can be
+      encoded; many are listed in <xref target="RFC2388"/> under
+      "Other data encodings rather than multipart".  The
+      multipart/form-data encoding is verbose, especially if there are
+      many fields with short values. In most use cases, this
+      overhead isn't significant. </t>
+      <t>More problematic is the ambiguity introduced because
+      implementations did not follow <xref target="RFC2388"/>
+      because it used "may" instead of "MUST" when specifying
+      encoding of field names, and for other unknown reasons,
+      so now, parsers need to be more complex for fuzzy matching
+      against the possible outputs of various encoding methods.
       </t>
     </section>
   </back>
