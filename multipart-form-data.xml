@@ -122,9 +122,9 @@
       <section title="filename attribute">
 	<t>
 	  For form data that represents the content of a local file,
-	  the original local file name may be supplied as as well, as a
+	  the original local file name MAY be supplied as well, as a
 	  "filename" parameter of the Content-Distribution header.  If
-	  the file name of the sender's operating system is not in
+	  the file name in the sender's operating system is not in
 	  US-ASCII, the file name MAY be approximated.  This is a
 	  convenience for those cases where the files supplied by the
 	  form might contain references to each other, e.g., a TeX file
@@ -254,19 +254,22 @@
 	    Currently, deployed browsers differ as to how they
             encode multipart/form-data. For this reason the matching
             of form elements to form-data parts may rely on a fuzzier
-            match.  In particular, some form interpreters might have
+            match.  In particular, some form-data generators might have
             followed the advice of <xref target="RFC2388"/> and used
             the <xref target="RFC2047"/> "encoded-word" method of
             encoding non-ASCII values:
 	    <figure><artwork>
      encoded-word = "=?" charset "?" encoding "?" encoded-text "?=" 
 	    </artwork></figure>
+	    Others have been known to follow <xref target="RFC2231"/> 
+	    or to send unencoded UTF-8 or strings in the document
+	    character set.
 	  </t>
           <t>
-	    Generally, interpreting multipart/form-data
-	    will require knowing the charset used in form encoding,
-	    in cases where the _charset_ field value or a 
-	    charset parameter of a text/plain Content-Type
+	    Generally, interpreting multipart/form-data, even from
+	    conforming generators, may require knowing the charset
+	    used in form encoding, in cases where the _charset_ field
+	    value or a charset parameter of a text/plain Content-Type
 	    header is not supplied.
           </t>
 	</section>
