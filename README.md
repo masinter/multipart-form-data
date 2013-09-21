@@ -14,6 +14,4 @@ Use a browser's save as PDF from .html to make a pdf.
 http://tools.ietf.org/html/draft-masinter-multipart-form-data
 for latest IETF submissions (pointer to .pdf and .xml from .txt file.)
 
-http://larry.masinter.net/multipart-form-data/multipart-form-data.html
-for (some) .html conversion.
 
