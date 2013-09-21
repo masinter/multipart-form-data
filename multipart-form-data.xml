@@ -122,13 +122,19 @@
       <section title="filename attribute">
 	<t>
 	  For form data that represents the content of a local file,
-	  the original local file name MAY be supplied as well, as a
-	  "filename" parameter of the Content-Distribution header.  If
-	  the file name in the sender's operating system is not in
-	  US-ASCII, the file name MAY be approximated.  This is a
-	  convenience for those cases where the files supplied by the
-	  form might contain references to each other, e.g., a TeX file
-	  and its .sty auxiliary style description.
+	  a name for the file SHOULD be supplied as well, by using a
+	  "filename" parameter of the Content-Distribution header.
+	  (The SHOULD is to allow file uploads that result from 
+	  drag-and-drop in systems where the file name is meaningless,
+	  private, where the uploaded 'file' is streamed directly
+	  from a device, where the file name is not user visible
+	  and thus would be unrecognized).
+	  For compatibility with other multipart types, the value
+	  of the filename parameter MUST be restricted to US-ASCII.
+	  File names normally visible to users which contain
+	  non-ASCII characters SHOULD
+	  be encoded using the &amp;#nn method described in
+	  <xref target="amphash"/>. 
 	</t>
       </section>
 	  
@@ -217,6 +223,16 @@
           names. This should not be a burden, because in general the
           field names are not visible to users.</t>
         </section>
+	<section title="Ampersand hash encoding" anchor="amphash">
+	  <t>multipart/form-data uses an encoding for characters that
+	  are not allowed in a context using an encoding which replace
+	  the character by a string consisting of an ampersand
+	  character (&amp;), a "#" character, one or more ASCII digits
+	  representing the Unicode code point of the character in base
+	  ten, and finally a semicolon character (;).
+	  </t>
+	</section>
+
 	<section title="Interpreting forms and creating form-data">
 	  <t>Some applications of this specification will supply a
 	  character encoding to be used for creation of the
@@ -229,15 +245,9 @@
 	    the form, if it is US-ASCII compatible,</t>
 	    <t>otherwise UTF-8.</t>
 	  </list>
-	  Call this the form-charset.
-	  For each character in the entry's name that cannot be
-	  expressed using the form-charset, replace the
-	  character by a string consisting of an ampersand
-	  character (&amp;), a "#" character, one or more
-	  ASCII digits representing the Unicode code point of the
-	  character in base ten, and finally a semicolon
-	  character (;). The result is a US-ASCII surrogate.
-	  </t>
+	  Call this the form-charset. Any field name or
+	  file name which is not in US-ASCII must be encoded
+	  using the &amp;#nn; encoding in <xref target="amphash"/></t>
 	  <t>multipart/form-data parts which do not have
 	  a Content-Type header and which are not the result
 	  of supplying a local file MUST be transformed by
@@ -262,8 +272,8 @@
      encoded-word = "=?" charset "?" encoding "?" encoded-text "?=" 
 	    </artwork></figure>
 	    Others have been known to follow <xref target="RFC2231"/> 
-	    or to send unencoded UTF-8 or strings in the document
-	    character set.
+	    or to send unencoded UTF-8 or even unencoded strings
+	    in the form-charset.
 	  </t>
           <t>
 	    Generally, interpreting multipart/form-data, even from
