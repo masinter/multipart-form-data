@@ -1,5 +1,10 @@
-# ignore output of xml2rfc conversion
+# don't ignore output of xml2rfc conversion
 # plain text conversions
-multi*.txt
-multi*.html
-multi*.pdf
+# don't ignore 
+# multi*.txt
+# multi*.html
+# multi*.pdf
+
+# emacs detritus
+*~
+*#

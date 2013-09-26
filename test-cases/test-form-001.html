@@ -61,30 +61,35 @@
    }
  </script>
 </div>
+
 <h2>Subtest A</h2>
 <p>ASCII-safe data: name=test, value=test</p>
 <form action="http://www.posttestserver.com/post.php?dump&html&dir=multipart-test" method="post" enctype="multipart/form-data">
  <input type=hidden name=test value=text>
  <input type=submit>
 </form>
+
 <h2>Subtest B1</h2>
 <p>Win1252-safe data in value: name=test value=t&eacute;xt</p>
 <form action="http://www.posttestserver.com/post.php?dump&html&dir=multipart-test" method="post" enctype="multipart/form-data">
  <input type=hidden name=test value=t&eacute;xt>
  <input type=submit>
 </form>
+
 <h2>Subtest B2</h2>
 <p>Win1252-safe data in name: name=t&eacute;st value=text</p>
 <form action="http://www.posttestserver.com/post.php?dump&html&dir=multipart-test" method="post" enctype="multipart/form-data">
  <input type=hidden name=t&eacute;st value=text>
  <input type=submit>
 </form>
+
 <h2>Subtest C1</h2>
 <p>Unicode-safe data in value: name=test value=text&amp;x263A;</p>
 <form action="http://www.posttestserver.com/post.php?dump&html&dir=multipart-test" method="post" enctype="multipart/form-data">
  <input type=hidden name=test value=text&#x263A;>
  <input type=submit>
 </form>
+
 <h2>Subtest C2</h2>
 <p>Unicode-safe data in value: name=test&amp;#x263a; value=text</p>
 <form action="http://www.posttestserver.com/post.php?dump&html&dir=multipart-test" method="post" enctype="multipart/form-data">

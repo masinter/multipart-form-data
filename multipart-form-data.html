@@ -1,0 +1,738 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head profile="http://www.w3.org/2006/03/hcard%20http://dublincore.org/documents/2008/08/04/dc-html/">
+  <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+
+  <title>Returning Values from Forms: multipart/form-data</title>
+
+  <style type="text/css" title="Xml2Rfc (sans serif)">
+  /*<![CDATA[*/
+	  a {
+	  text-decoration: none;
+	  }
+	  a.smpl {
+	  color: black;
+	  }
+	  a:hover {
+	  text-decoration: underline;
+	  }
+	  a:active {
+	  text-decoration: underline;
+	  }
+	  address {
+	  margin-top: 1em;
+	  margin-left: 2em;
+	  font-style: normal;
+	  }
+	  body {
+	  color: black;
+	  font-family: verdana, helvetica, arial, sans-serif;
+	  font-size: 10pt;
+	  
+	  }
+	  cite {
+	  font-style: normal;
+	  }
+	  dd {
+	  margin-right: 2em;
+	  }
+	  dl {
+	  margin-left: 2em;
+	  }
+	
+	  ul.empty {
+	  list-style-type: none;
+	  }
+	  ul.empty li {
+	  margin-top: .5em;
+	  }
+	  dl p {
+	  margin-left: 0em;
+	  }
+	  dt {
+	  margin-top: .5em;
+	  }
+	  h1 {
+	  font-size: 14pt;
+	  line-height: 21pt;
+	  page-break-after: avoid;
+	  }
+	  h1.np {
+	  page-break-before: always;
+	  }
+	  h1 a {
+	  color: #333333;
+	  }
+	  h2 {
+	  font-size: 12pt;
+	  line-height: 15pt;
+	  page-break-after: avoid;
+	  }
+	  h3, h4, h5, h6 {
+	  font-size: 10pt;
+	  page-break-after: avoid;
+	  }
+	  h2 a, h3 a, h4 a, h5 a, h6 a {
+	  color: black;
+	  }
+	  img {
+	  margin-left: 3em;
+	  }
+	  li {
+	  margin-left: 2em;
+	  margin-right: 2em;
+	  }
+	  ol {
+	  margin-left: 2em;
+	  margin-right: 2em;
+	  }
+	  ol p {
+	  margin-left: 0em;
+	  }
+	  p {
+	  margin-left: 2em;
+	  margin-right: 2em;
+	  }
+	  pre {
+	  margin-left: 3em;
+	  background-color: lightyellow;
+	  padding: .25em;
+	  }
+	  pre.text2 {
+	  border-style: dotted;
+	  border-width: 1px;
+	  background-color: #f0f0f0;
+	  width: 69em;
+	  }
+	  pre.inline {
+	  background-color: white;
+	  padding: 0em;
+	  }
+	  pre.text {
+	  border-style: dotted;
+	  border-width: 1px;
+	  background-color: #f8f8f8;
+	  width: 69em;
+	  }
+	  pre.drawing {
+	  border-style: solid;
+	  border-width: 1px;
+	  background-color: #f8f8f8;
+	  padding: 2em;
+	  }
+	  table {
+	  margin-left: 2em;
+	  }
+	  table.tt {
+	  vertical-align: top;
+	  }
+	  table.full {
+	  border-style: outset;
+	  border-width: 1px;
+	  }
+	  table.headers {
+	  border-style: outset;
+	  border-width: 1px;
+	  }
+	  table.tt td {
+	  vertical-align: top;
+	  }
+	  table.full td {
+	  border-style: inset;
+	  border-width: 1px;
+	  }
+	  table.tt th {
+	  vertical-align: top;
+	  }
+	  table.full th {
+	  border-style: inset;
+	  border-width: 1px;
+	  }
+	  table.headers th {
+	  border-style: none none inset none;
+	  border-width: 1px;
+	  }
+	  table.left {
+	  margin-right: auto;
+	  }
+	  table.right {
+	  margin-left: auto;
+	  }
+	  table.center {
+	  margin-left: auto;
+	  margin-right: auto;
+	  }
+	  caption {
+	  caption-side: bottom;
+	  font-weight: bold;
+	  font-size: 9pt;
+	  margin-top: .5em;
+	  }
+	
+	  table.header {
+	  border-spacing: 1px;
+	  width: 95%;
+	  font-size: 10pt;
+	  color: white;
+	  }
+	  td.top {
+	  vertical-align: top;
+	  }
+	  td.topnowrap {
+	  vertical-align: top;
+	  white-space: nowrap; 
+	  }
+	  table.header td {
+	  background-color: gray;
+	  width: 50%;
+	  }
+	  table.header a {
+	  color: white;
+	  }
+	  td.reference {
+	  vertical-align: top;
+	  white-space: nowrap;
+	  padding-right: 1em;
+	  }
+	  thead {
+	  display:table-header-group;
+	  }
+	  ul.toc, ul.toc ul {
+	  list-style: none;
+	  margin-left: 1.5em;
+	  margin-right: 0em;
+	  padding-left: 0em;
+	  }
+	  ul.toc li {
+	  line-height: 150%;
+	  font-weight: bold;
+	  font-size: 10pt;
+	  margin-left: 0em;
+	  margin-right: 0em;
+	  }
+	  ul.toc li li {
+	  line-height: normal;
+	  font-weight: normal;
+	  font-size: 9pt;
+	  margin-left: 0em;
+	  margin-right: 0em;
+	  }
+	  li.excluded {
+	  font-size: 0pt;
+	  }
+	  ul p {
+	  margin-left: 0em;
+	  }
+	
+	  .comment {
+	  background-color: yellow;
+	  }
+	  .center {
+	  text-align: center;
+	  }
+	  .error {
+	  color: red;
+	  font-style: italic;
+	  font-weight: bold;
+	  }
+	  .figure {
+	  font-weight: bold;
+	  text-align: center;
+	  font-size: 9pt;
+	  }
+	  .filename {
+	  color: #333333;
+	  font-weight: bold;
+	  font-size: 12pt;
+	  line-height: 21pt;
+	  text-align: center;
+	  }
+	  .fn {
+	  font-weight: bold;
+	  }
+	  .hidden {
+	  display: none;
+	  }
+	  .left {
+	  text-align: left;
+	  }
+	  .right {
+	  text-align: right;
+	  }
+	  .title {
+	  color: #990000;
+	  font-size: 18pt;
+	  line-height: 18pt;
+	  font-weight: bold;
+	  text-align: center;
+	  margin-top: 36pt;
+	  }
+	  .vcardline {
+	  display: block;
+	  }
+	  .warning {
+	  font-size: 14pt;
+	  background-color: yellow;
+	  }
+	
+	
+	  @media print {
+	  .noprint {
+		display: none;
+	  }
+	
+	  a {
+		color: black;
+		text-decoration: none;
+	  }
+	
+	  table.header {
+		width: 90%;
+	  }
+	
+	  td.header {
+		width: 50%;
+		color: black;
+		background-color: white;
+		vertical-align: top;
+		font-size: 12pt;
+	  }
+	
+	  ul.toc a::after {
+		content: leader('.') target-counter(attr(href), page);
+	  }
+	
+	  ul.ind li li a {
+		content: target-counter(attr(href), page);
+	  }
+	
+	  .print2col {
+		column-count: 2;
+		-moz-column-count: 2;
+		column-fill: auto;
+	  }
+	  }
+	
+	  @page {
+	  @top-left {
+		   content: "Internet-Draft"; 
+	  } 
+	  @top-right {
+		   content: "December 2010"; 
+	  } 
+	  @top-center {
+		   content: "Abbreviated Title";3
+	  } 
+	  @bottom-left {
+		   content: "Doe"; 
+	  } 
+	  @bottom-center {
+		   content: "Expires June 2011"; 
+	  } 
+	  @bottom-right {
+		   content: "[Page " counter(page) "]"; 
+	  } 
+	  }
+	
+	  @page:first { 
+		@top-left {
+		  content: normal;
+		}
+		@top-right {
+		  content: normal;
+		}
+		@top-center {
+		  content: normal;
+		}
+	  }
+  /*]]>*/
+  </style>
+
+  <link href="#rfc.toc" rel="Contents">
+<link href="#rfc.section.1" rel="Chapter" title="1 Introduction">
+<link href="#rfc.section.2" rel="Chapter" title="2 Definition of multipart/form-data">
+<link href="#rfc.section.2.1" rel="Chapter" title="2.1 Boundary">
+<link href="#rfc.section.2.2" rel="Chapter" title="2.2 filename attribute">
+<link href="#rfc.section.2.3" rel="Chapter" title="2.3 Multiple files for one form field">
+<link href="#rfc.section.2.4" rel="Chapter" title="2.4 Content-Type">
+<link href="#rfc.section.2.5" rel="Chapter" title="2.5 The charset parameter">
+<link href="#rfc.section.2.6" rel="Chapter" title="2.6 The _charset_ field">
+<link href="#rfc.section.2.7" rel="Chapter" title="2.7 Content-Transfer-Encoding">
+<link href="#rfc.section.2.8" rel="Chapter" title="2.8 Other Content- headers">
+<link href="#rfc.section.3" rel="Chapter" title="3 Operability considerations">
+<link href="#rfc.section.3.1" rel="Chapter" title="3.1 Non-ASCII field names and values">
+<link href="#rfc.section.3.1.1" rel="Chapter" title="3.1.1 Avoid creating forms with non-ASCII field names">
+<link href="#rfc.section.3.1.2" rel="Chapter" title="3.1.2 Ampersand hash encoding">
+<link href="#rfc.section.3.1.3" rel="Chapter" title="3.1.3 Interpreting forms and creating form-data">
+<link href="#rfc.section.3.1.4" rel="Chapter" title="3.1.4 Parsing and interpreting form data">
+<link href="#rfc.section.3.2" rel="Chapter" title="3.2 Ordered fields and duplicated field names">
+<link href="#rfc.section.3.3" rel="Chapter" title="3.3 Interoperability with web applications">
+<link href="#rfc.section.3.4" rel="Chapter" title="3.4 Correlating form data with the original form">
+<link href="#rfc.section.4" rel="Chapter" title="4 Security Considerations">
+<link href="#rfc.section.5" rel="Chapter" title="5 Media type registration for multipart/form-data">
+<link href="#rfc.references" rel="Chapter" title="6 References">
+<link href="#rfc.references.1" rel="Chapter" title="6.1 Normative References">
+<link href="#rfc.references.2" rel="Chapter" title="6.2 Informative References">
+<link href="#rfc.appendix.Appendix%20A" rel="Chapter" title="Appendix A Changes from RFC 2388">
+<link href="#rfc.appendix.Appendix%20B" rel="Chapter" title="Appendix B Alternatives">
+<link href="#rfc.authors" rel="Chapter">
+
+
+  <meta name="generator" content=
+  "http://greenbytes.de/tech/webdav/rfc2629.xslt, Revision 1.539, 2011-01-02 17:13:00, XSLT vendor: SAXON 6.5.5 from Michael Kay http://saxon.sf.net/" />
+  <link rel="schema.dct" href="http://purl.org/dc/terms/" />
+  <meta name="dct.creator" content="Doe, J." />
+  <meta name="dct.identifier" content="urn:ietf:id:draft-sample-input-00" />
+  <meta name="dct.issued" scheme="ISO8601" content="2010-12" />
+  
+  <meta name="dct.abstract" content="This specification (re)defines the multipart/form-data Internet Media Type, which can be used by a wide variety of applications and transported by a wide variety of protocols as a way of returning a set of values as the result of a user filling out a form.  It replaces RFC 2388.  " />
+  <meta name="description" content="This specification (re)defines the multipart/form-data Internet Media Type, which can be used by a wide variety of applications and transported by a wide variety of protocols as a way of returning a set of values as the result of a user filling out a form.  It replaces RFC 2388.  " />
+  <meta name="keywords" content="" />
+
+</head>
+
+<body>
+
+  <table class="header">
+    <tbody>
+    
+    	<tr>
+<td class="left">Network Working Group</td>
+<td class="right">L. Masinter</td>
+</tr>
+<tr>
+<td class="left">Internet-Draft</td>
+<td class="right">Adobe</td>
+</tr>
+<tr>
+<td class="left">Obsoletes: 2388 (if approved)</td>
+<td class="right">September 26, 2013</td>
+</tr>
+<tr>
+<td class="left">Intended status: Standards Track</td>
+<td class="right"></td>
+</tr>
+<tr>
+<td class="left">Expires: March 28, 2014</td>
+<td class="right"></td>
+</tr>
+
+    	
+    </tbody>
+  </table>
+
+  <p class="title">Returning Values from Forms: multipart/form-data<br />
+  <span class="filename">draft-masinter-multipart-form-data-04</span></p>
+  
+  <h1 id="rfc.abstract"><a href="#rfc.abstract">Abstract</a></h1>
+<p>This specification (re)defines the multipart/form-data Internet Media Type, which can be used by a wide variety of applications and transported by a wide variety of protocols as a way of returning a set of values as the result of a user filling out a form.  It replaces RFC 2388.  </p>
+<h1><a>NOTE</a></h1>
+<p>There is a GitHub repository for this draft at https://github.com/masinter/multipart-form-data along with an issue tracker. This specification has been proposed as a work item of the APPSAWG Applications Area working group, apps-discuss@ietf.org. Please raise issues in the tracker, or send to the apps-discuss list.</p>
+<h1 id="rfc.status"><a href="#rfc.status">Status of this Memo</a></h1>
+<p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
+<p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet- Drafts is at http://datatracker.ietf.org/drafts/current/.</p>
+<p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
+<p>This Internet-Draft will expire on March 28, 2014.</p>
+<h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
+<p>Copyright (c) 2013 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
+<p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (http://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
+
+  
+  <hr class="noprint" />
+  <h1 class="np" id="rfc.toc"><a href="#rfc.toc">Table of Contents</a></h1>
+  <ul class="toc">
+
+  	<li>1.   <a href="#rfc.section.1">Introduction</a>
+</li>
+<li>2.   <a href="#rfc.section.2">Definition of multipart/form-data</a>
+</li>
+<li>2.1.   <a href="#rfc.section.2.1">Boundary</a>
+</li>
+<li>2.2.   <a href="#rfc.section.2.2">filename attribute</a>
+</li>
+<li>2.3.   <a href="#rfc.section.2.3">Multiple files for one form field</a>
+</li>
+<li>2.4.   <a href="#rfc.section.2.4">Content-Type</a>
+</li>
+<li>2.5.   <a href="#rfc.section.2.5">The charset parameter</a>
+</li>
+<li>2.6.   <a href="#rfc.section.2.6">The _charset_ field</a>
+</li>
+<li>2.7.   <a href="#rfc.section.2.7">Content-Transfer-Encoding</a>
+</li>
+<li>2.8.   <a href="#rfc.section.2.8">Other Content- headers</a>
+</li>
+<li>3.   <a href="#rfc.section.3">Operability considerations</a>
+</li>
+<li>3.1.   <a href="#rfc.section.3.1">Non-ASCII field names and values</a>
+</li>
+<li>3.1.1.   <a href="#rfc.section.3.1.1">Avoid creating forms with non-ASCII field names</a>
+</li>
+<li>3.1.2.   <a href="#rfc.section.3.1.2">Ampersand hash encoding</a>
+</li>
+<li>3.1.3.   <a href="#rfc.section.3.1.3">Interpreting forms and creating form-data</a>
+</li>
+<li>3.1.4.   <a href="#rfc.section.3.1.4">Parsing and interpreting form data</a>
+</li>
+<li>3.2.   <a href="#rfc.section.3.2">Ordered fields and duplicated field names</a>
+</li>
+<li>3.3.   <a href="#rfc.section.3.3">Interoperability with web applications</a>
+</li>
+<li>3.4.   <a href="#rfc.section.3.4">Correlating form data with the original form</a>
+</li>
+<li>4.   <a href="#rfc.section.4">Security Considerations</a>
+</li>
+<li>5.   <a href="#rfc.section.5">Media type registration for multipart/form-data</a>
+</li>
+<li>6.   <a href="#rfc.references">References</a>
+</li>
+<li>6.1.   <a href="#rfc.references.1">Normative References</a>
+</li>
+<li>6.2.   <a href="#rfc.references.2">Informative References</a>
+</li>
+<li>Appendix A.   <a href="#rfc.appendix.Appendix%20A">Changes from RFC 2388</a>
+</li>
+<li>Appendix B.   <a href="#rfc.appendix.Appendix%20B">Alternatives</a>
+</li>
+<li><a href="#rfc.authors">Author's Address</a>
+</li>
+
+
+  </ul>
+
+  <h1 id="rfc.section.1">
+<a href="#rfc.section.1">1.</a> Introduction</h1>
+<p id="rfc.section.1.p.1">In many applications, it is possible for a user to be presented with a form. The user will fill out the form, including information that is typed, generated by user input, or included from files that the user has selected. When the form is filled out, the data from the form is sent from the user to the receiving application.  </p>
+<p id="rfc.section.1.p.2">The definition of <samp>multipart/form-data</samp> is derived from one of those applications, originally set out in <a href="#RFC1867">[RFC1867]</a> and subsequently incorporated into <a href="#HTML3.2">[HTML3.2]</a> and <a href="#HTML4">[HTML4]</a>, where forms are expressed in HTML, and in which the form values are sent via HTTP or electronic mail. This representation is widely implemented in numerous web browsers and web servers.  </p>
+<p id="rfc.section.1.p.3">However, multipart/form-data can be used for forms that are presented using representations other than HTML (spreadsheets, Portable Document Format, etc.), and for transport using other means than electronic mail or HTTP. This document defines the representation of form values independently of the application for which it is used.  </p>
+<h1 id="rfc.section.2">
+<a href="#rfc.section.2">2.</a> Definition of multipart/form-data</h1>
+<p id="rfc.section.2.p.1">The media-type multipart/form-data generally follows the model of multipart MIME data streams as described in <a href="#RFC2046">[RFC2046]</a> Section 5.1.  </p>
+<p id="rfc.section.2.p.2">In forms, there are a series of fields to be supplied by the user who fills out the form.  Each field has a name. Within a given form, the names SHOULD be unique. After a form has been filled out and submitted (processes defined by the form), the result is a set of values for each field-- the form-data.  </p>
+<div id="#rfc.figure.1"></div>
+<pre>
+        Content-Disposition: form-data; name="user"
+      </pre>
+<p id="rfc.section.2.p.3">A <samp>multipart/form-data</samp> body contains a series of parts. Each part MUST contain a <samp>Content-Disposition</samp> header <a href="#RFC2183">[RFC2183]</a> where the disposition type is <samp>form-data</samp>, and where the disposition contains an (additional) parameter of <samp>name</samp>; the value of the parameter is the original field name from the form (encoded, see <a href="#non-ascii-fields">Section 3.1</a>).  For example, a part might contain a header: <samp>user</samp> field.  </p>
+<h1 id="rfc.section.2.1">
+<a href="#rfc.section.2.1">2.1.</a> Boundary</h1>
+<p id="rfc.section.2.1.p.1">As with other multipart types, the parts are delimited with a boundary, selected such that it does not occur in any of the data. Each field of the form is sent, in the order defined by the sending application and form, as a part of the multipart stream. The boundary is supplied as a "boundary" parameter to the multipart/form-data type, e.g., </p>
+<div id="#rfc.figure.2"></div>
+<pre>
+	    multipart/form-data;boundary="-AaB03x"
+	  </pre>
+<p></p>
+<h1 id="rfc.section.2.2">
+<a href="#rfc.section.2.2">2.2.</a> filename attribute</h1>
+<p id="rfc.section.2.2.p.1">For form data that represents the content of a local file, a name for the file SHOULD be supplied as well, by using a "filename" parameter of the Content-Distribution header.  (The SHOULD is to allow file uploads that result from drag-and-drop in systems where the file name is meaningless or private, where the uploaded content is streamed directly from a device, or where the file name is not user visible and would be unrecognized.) </p>
+<p id="rfc.section.2.2.p.2">For compatibility with other multipart types, the value of the <samp>filename</samp> parameter MUST be restricted to US-ASCII.  File names normally visible to users which contain non-ASCII characters SHOULD be encoded using the &amp;#nn; method described in <a href="#amphash">Section 3.1.2</a>.  </p>
+<h1 id="rfc.section.2.3">
+<a href="#rfc.section.2.3">2.3.</a> Multiple files for one form field</h1>
+<p id="rfc.section.2.3.p.1">If the value of a form field is a set of files rather than a single file, that value MUST be transmitted by supplying each in a separate part, but all with the same <samp>name</samp> parameter.  </p>
+<h1 id="rfc.section.2.4">
+<a href="#rfc.section.2.4">2.4.</a> Content-Type</h1>
+<p id="rfc.section.2.4.p.1">Each part has an (optional) <samp>Content-Type</samp>, which defaults to <samp>text/plain</samp>.  If the contents of a file are to be sent, the file data is labeled with an appropriate media type, if known, or <samp>application/octet-stream</samp>.  </p>
+<h1 id="rfc.section.2.5">
+<a href="#rfc.section.2.5">2.5.</a> The charset parameter</h1>
+<p id="rfc.section.2.5.p.1">In the case where a field value is text, the charset parameter for the <samp>text/plain</samp> Content-Type may be used to indicate the character encoding used in that part.  For example, a form with a text field in which a user typed "Joe owes &lt;eu&gt;100" where &lt;eu&gt; is the Euro symbol might have form data returned as: </p>
+<div id="#rfc.figure.3"></div>
+<pre>
+	  --AaB03x
+	  content-disposition: form-data; name="field1"
+	  content-type: text/plain;charset=UTF-8
+	  content-transfer-encoding: quoted-printable
+	    
+	  Joe owes =E2=82=AC100.
+	  --AaB03x
+	</pre>
+<h1 id="rfc.section.2.6">
+<a href="#rfc.section.2.6">2.6.</a> The _charset_ field</h1>
+<p id="rfc.section.2.6.p.1">Forms have the convention that the value of a form entry with entry name <samp>_charset_</samp> and type <samp>hidden</samp> is automatically set to the name of the form-charset. In this case, the value of the default charset of each text/plain part without a charset parameter is the supplied value.</p>
+<h1 id="rfc.section.2.7">
+<a href="#rfc.section.2.7">2.7.</a> Content-Transfer-Encoding</h1>
+<p id="rfc.section.2.7.p.1">When used in transports which do not allow arbitrary binary data, each part that cannot be represented within the transport SHOULD be encoded and the <samp>Content-Transfer-Encoding</samp> header supplied in that part.  For example, some email transports use a 7BIT encoding. (See section 5 of <a href="#RFC2046">[RFC2046]</a> for more details.) When transferred via HTTP, Content-Transfer-Encoding the form-data values SHOULD NOT be used.  </p>
+<h1 id="rfc.section.2.8">
+<a href="#rfc.section.2.8">2.8.</a> Other Content- headers</h1>
+<p id="rfc.section.2.8.p.1">The <samp>multipart/form-data</samp> media type does not support any MIME headers in the parts other than Content-Type, Content-Disposition, and (when appropriate), Content-Transfer-Encoding.  </p>
+<h1 id="rfc.section.3">
+<a href="#rfc.section.3">3.</a> Operability considerations</h1>
+<h1 id="rfc.section.3.1">
+<a href="#rfc.section.3.1">3.1.</a> <a href="#non-ascii-fields" id="non-ascii-fields">Non-ASCII field names and values</a>
+</h1>
+<p id="rfc.section.3.1.p.1">MIME headers in multipart/form-data are required to consist only of 7-bit data in the US-ASCII character set.  While <a href="#RFC2388">[RFC2388]</a> suggested that non-ASCII field names should be encoded according to the method in <a href="#RFC2047">[RFC2047]</a> if they contain characters outside of US-ASCII, practice varies.  </p>
+<p id="rfc.section.3.1.p.2">This specification makes three recommendations for three different states of workflow.</p>
+<h1 id="rfc.section.3.1.1">
+<a href="#rfc.section.3.1.1">3.1.1.</a> Avoid creating forms with non-ASCII field names</h1>
+<p id="rfc.section.3.1.1.p.1">For broadest interoperability with existing deployed software, those creating forms SHOULD avoid non-ASCII field names. This should not be a burden, because in general the field names are not visible to users.</p>
+<h1 id="rfc.section.3.1.2">
+<a href="#rfc.section.3.1.2">3.1.2.</a> <a href="#amphash" id="amphash">Ampersand hash encoding</a>
+</h1>
+<p id="rfc.section.3.1.2.p.1">Within this specification, the "ampersand hash encoding" is used for representing characters that are not allowed in a context: replace each disallowed character character by a string consisting of an ampersand (&amp;), a hash mark (#), one or more ASCII digits representing the Unicode code point of the character in base ten, and finally a semicolon (;).  </p>
+<h1 id="rfc.section.3.1.3">
+<a href="#rfc.section.3.1.3">3.1.3.</a> Interpreting forms and creating form-data</h1>
+<p id="rfc.section.3.1.3.p.1">Some applications of this specification will supply a character encoding to be used for creation of the multipart/form-data result. In particular, <a href="#HTML5">[HTML5]</a> uses: <a href="#amphash">Section 3.1.2</a></p>
+
+<ul>
+<li>the value of an accept-charset attribute of the &lt;form&gt; element, if there is one,</li>
+<li>the character encoding of the document containing the form, if it is US-ASCII compatible,</li>
+<li>otherwise UTF-8.</li>
+</ul>
+
+<p> Call this the form-charset. Any field name or file name which is not in US-ASCII must be encoded using the &amp;#nn; encoding in </p>
+<p id="rfc.section.3.1.3.p.2">multipart/form-data parts which do not have a Content-Type header and which are not the result of supplying a local file MUST be transformed by the same algorithm.  </p>
+<h1 id="rfc.section.3.1.4">
+<a href="#rfc.section.3.1.4">3.1.4.</a> Parsing and interpreting form data</h1>
+<div id="#rfc.figure.4"></div>
+<pre>
+     encoded-word = "=?" charset "?" encoding "?" encoded-text "?=" 
+	    </pre>
+<p id="rfc.section.3.1.4.p.1">While this specification provides guidance for creation of multipart/form-data, interpreters of multipart/form-data should be aware of the variety of implementations.  Currently, deployed browsers differ as to how they encode multipart/form-data. For this reason the matching of form elements to form-data parts may rely on a fuzzier match.  In particular, some form-data generators might have followed the advice of <a href="#RFC2388">[RFC2388]</a> and used the <a href="#RFC2047">[RFC2047]</a> "encoded-word" method of encoding non-ASCII values: <a href="#RFC2231">[RFC2231]</a> or to send unencoded UTF-8 or even unencoded strings in the form-charset.  </p>
+<p id="rfc.section.3.1.4.p.2">Generally, interpreting <samp>multipart/form-data</samp> (even from conforming generators) may require knowing the charset used in form encoding, in cases where the _charset_ field value or a charset parameter of a text/plain Content-Type header is not supplied.  </p>
+<h1 id="rfc.section.3.2">
+<a href="#rfc.section.3.2">3.2.</a> Ordered fields and duplicated field names</h1>
+<p id="rfc.section.3.2.p.1">Form processors given forms with a well-defined ordering SHOULD send back results in the order received and preserve duplicate field names, in order.  Intermediaries MUST NOT reorder the results.(Note that there are some forms which do not define a natural order of appearance.) </p>
+<h1 id="rfc.section.3.3">
+<a href="#rfc.section.3.3">3.3.</a> Interoperability with web applications</h1>
+<p id="rfc.section.3.3.p.1">Many web applications use the "application/x-url-encoded" method for returning data from forms. This format is quite compact, e.g.: </p>
+<div id="#rfc.figure.5"></div>
+<pre>
+	  name=Xavier+Xantico&amp;verdict=Yes&amp;colour=Blue&amp;happy=sad&amp;Utf%F6r=Send
+	</pre>
+<p id="rfc.section.3.3.p.2">However, there is no opportunity to label the enclosed data with content type, apply a charset, or use other encoding mechanisms.  </p>
+<p id="rfc.section.3.3.p.3">Many form-interpreting programs (primarily web browsers) now implement and generate multipart/form-data, but an existing application might need to optionally support both the application/x-url-encoded format as well.  </p>
+<h1 id="rfc.section.3.4">
+<a href="#rfc.section.3.4">3.4.</a> Correlating form data with the original form</h1>
+<p id="rfc.section.3.4.p.1">This specification provides no specific mechanism by which multipart/form-data can be associated with the form that caused it to be transmitted. This separation is intentional; many different forms might be used for transmitting the same data. In practice, applications may supply a specific form processing resource (in HTML, the ACTION attribute in a FORM tag) for each different form.  Alternatively, data about the form might be encoded in a "hidden field" (a field which is part of the form but which has a fixed value to be transmitted back to the form-data processor.) </p>
+<h1 id="rfc.section.4">
+<a href="#rfc.section.4">4.</a> <a href="#security" id="security">Security Considerations</a>
+</h1>
+<p id="rfc.section.4.p.1">It is important when interpreting the filename of the Content-Disposition header to not overwrite files in the recipient's file space inadvertently.  </p>
+<p id="rfc.section.4.p.2">User applications that request form information from users must be careful not to cause a user to send information to the requestor or a third party unwillingly or unwittingly. For example, a form might request 'spam' information to be sent to an unintended third party, or private information to be sent to someone that the user might not actually intend. While this is primarily an issue for the representation and interpretation of forms themselves (rather than the data representation of the form data),  the transportation of private information must be done in a way that does not expose it to unwanted prying.  </p>
+<p id="rfc.section.4.p.3">With the introduction of form-data that can reasonably send back the content of files from a user's file space, the possibility arises that a user might be sent an automated script that fills out a form and then sends one of the user's local files to another address. Thus, additional caution is required when executing automated scripting where form-data might include a user's files.  </p>
+<h1 id="rfc.section.5">
+<a href="#rfc.section.5">5.</a> Media type registration for multipart/form-data</h1>
+<p></p>
+
+<dl>
+<dt>Media Type name:</dt>
+<dd style="margin-left: 8">multipart </dd>
+<dt>Media subtype name:</dt>
+<dd style="margin-left: 8">form-data </dd>
+<dt>Required parameters:</dt>
+<dd style="margin-left: 8">boundary </dd>
+<dt>Optional parameters:</dt>
+<dd style="margin-left: 8">none </dd>
+<dt>Encoding considerations:</dt>
+<dd style="margin-left: 8">For use in transports that restrict the encoding to 7BIT or 8BIT, each part is encoded separately.  </dd>
+<dt>Security considerations:</dt>
+<dd style="margin-left: 8">Applications which receive forms and process them must be careful not to supply data back to the requesting form processing site that was not intended to be sent by the recipient. This is a consideration for any application that generates a multipart/form-data.  See <a href="#security">Section 4</a> of this document.  </dd>
+</dl>
+
+<p> </p>
+<h1 id="rfc.references">
+<a href="#rfc.references">6.</a> References</h1>
+<h1 id="rfc.references.1">
+<a href="#rfc.references.1">6.1.</a> Normative References</h1>
+<table><tbody>
+<tr>
+<td class="reference"><b id="RFC2046">[RFC2046]</b></td>
+<td class="top">
+<a href="mailto:ned@innosoft.com" title="Innosoft International, Inc.">Freed, N.</a> and <a href="mailto:nsb@nsb.fv.com" title="First Virtual Holdings">N. Borenstein</a>, "<a href="http://tools.ietf.org/html/rfc2046">Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types</a>", RFC 2046, November 1996.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC2047">[RFC2047]</b></td>
+<td class="top">
+<a href="mailto:moore@cs.utk.edu" title="University of Tennessee">Moore, K.</a>, "<a href="http://tools.ietf.org/html/rfc2047">MIME (Multipurpose Internet Mail Extensions) Part Three: Message Header Extensions for Non-ASCII Text</a>", RFC 2047, November 1996.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC2231">[RFC2231]</b></td>
+<td class="top">
+<a href="mailto:ned.freed@innosoft.com" title="Innosoft International, Inc.">Freed, N.</a> and <a href="mailto:moore@cs.utk.edu" title="University of Tennessee">K. Moore</a>, "<a href="http://tools.ietf.org/html/rfc2231">MIME Parameter Value and Encoded Word Extensions: Character Sets, Languages, and Continuations</a>", RFC 2231, November 1997.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC1806">[RFC1806]</b></td>
+<td class="top">
+<a href="mailto:rens@century.com" title="New Century Systems">Troost, R.</a> and <a href="mailto:sdorner@qualcomm.com" title="QUALCOMM Incorporated">S. Dorner</a>, "<a href="http://tools.ietf.org/html/rfc1806">Communicating Presentation Information in Internet Messages: The Content-Disposition Header</a>", RFC 1806, June 1995.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC2183">[RFC2183]</b></td>
+<td class="top">
+<a href="mailto:rens@century.com" title="New Century Systems">Troost, R.</a>, <a href="mailto:sdorner@qualcomm.com" title="QUALCOMM Incorporated">Dorner, S.</a> and <a href="mailto:moore@cs.utk.edu" title="Department of Computer Science">K. Moore</a>, "<a href="http://tools.ietf.org/html/rfc2183">Communicating Presentation Information in Internet Messages: The Content-Disposition Header Field</a>", RFC 2183, August 1997.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC2184">[RFC2184]</b></td>
+<td class="top">
+<a href="mailto:ned@innosoft.com" title="Innosoft International, Inc.">Freed, N.</a> and <a href="mailto:moore@cs.utk.edu" title="Computer Science Dept.">K. Moore</a>, "<a href="http://tools.ietf.org/html/rfc2184">MIME Parameter Value and Encoded Word Extensions: Character Sets, Languages, and Continuations</a>", RFC 2184, August 1997.</td>
+</tr>
+</tbody></table>
+<h1 id="rfc.references.2">
+<a href="#rfc.references.2">6.2.</a> Informative References</h1>
+<table><tbody>
+<tr>
+<td class="reference"><b id="RFC1867">[RFC1867]</b></td>
+<td class="top">
+<a href="mailto:nebel@xsoft.sd.xerox.com" title="XSoft, Xerox Corporation">Nebel, E.</a> and <a href="mailto:masinter@parc.xerox.com" title="Xerox Palo Alto Research Center">L. Masinter</a>, "<a href="http://tools.ietf.org/html/rfc1867">Form-based File Upload in HTML</a>", RFC 1867, November 1995.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC2388">[RFC2388]</b></td>
+<td class="top">
+<a href="mailto:masinter@parc.xerox.com" title="Xerox Palo Alto Research Center">Masinter, L.</a>, "<a href="http://tools.ietf.org/html/rfc2388">Returning Values from Forms:  multipart/form-data</a>", RFC 2388, August 1998.</td>
+</tr>
+<tr>
+<td class="reference"><b id="HTML5">[HTML5]</b></td>
+<td class="top">
+<a>Berjon, R.</a>, <a>Faulkner, S.</a>, <a>Leithead, T.</a>, <a>Navara, E.</a>, <a>O'Connor, E.</a> and <a>S. Pfeiffer</a>, "<a>HTML5</a>", September 2013.</td>
+</tr>
+<tr>
+<td class="reference"><b id="HTML3.2">[HTML3.2]</b></td>
+<td class="top">
+<a>Raggett, D.</a>, "<a>HTML 3.2 Reference Specification</a>", World Wide Web Consortium Recommendation REC-html32-19970114, January 1997.</td>
+</tr>
+<tr>
+<td class="reference"><b id="HTML4">[HTML4]</b></td>
+<td class="top">
+<a>Raggett, D.</a>, <a>Hors, A.</a> and <a>I. Jacobs</a>, "<a>HTML 4.0 Recommendation</a>", World Wide Web Consortium REC-html40-971218, December 1997.</td>
+</tr>
+</tbody></table>
+<h1 id="rfc.appendix.Appendix A">
+<a href="#rfc.appendix.Appendix%20A">Appendix A.</a> Changes from RFC 2388</h1>
+<p id="rfc.section.Appendix A.p.1">The handling of multiple files submitted as the result of a single form field (e.g., HTML's &lt;input type=file multiple&gt; element) results in each file having its own top level part with the same name parameter; the method of using a nested <samp>multipart/mixed</samp> from <a href="#RFC2388">[RFC2388]</a> is not recommended.</p>
+<p id="rfc.section.Appendix A.p.2">The _charset_ convention and use of an explicit form-data charset is documented.</p>
+<p id="rfc.section.Appendix A.p.3">The handling of non-ASCII field names is changed significantly.  Few if any implemented the =?charset:string?= method of <a href="#RFC2047">[RFC2047]</a>.  </p>
+<p id="rfc.section.Appendix A.p.4">The relationship of the ordering of fields within a form and the ordering of returned values within multipart/form-data was not defined before, nor was the handling of the case where a form has multiple fields with the same name. </p>
+<p id="rfc.section.Appendix A.p.5">More prescriptive about order and duplicates.</p>
+<p id="rfc.section.Appendix A.p.6">Remove obsolete discussion of alternatives.</p>
+<h1 id="rfc.appendix.Appendix B">
+<a href="#rfc.appendix.Appendix%20B">Appendix B.</a> Alternatives</h1>
+<p id="rfc.section.Appendix B.p.1">There are numerous alternative ways in which form data can be encoded; many are listed in <a href="#RFC2388">[RFC2388]</a> under "Other data encodings rather than multipart."  The multipart/form-data encoding is verbose, especially if there are many fields with short values. In most use cases, this overhead isn't significant. </p>
+<p id="rfc.section.Appendix B.p.2">More problematic is the ambiguity introduced because implementations did not follow <a href="#RFC2388">[RFC2388]</a> because it used "may" instead of "MUST" when specifying encoding of field names, and for other unknown reasons, so now, parsers need to be more complex for fuzzy matching against the possible outputs of various encoding methods.  </p>
+<h1 id="rfc.authors"><a href="#rfc.authors">Author's Address</a></h1>
+<div class="avoidbreak">
+  <address class="vcard">
+	<span class="vcardline">
+	  <span class="fn">Larry Masinter</span> 
+	  <span class="n hidden">
+		<span class="family-name">Masinter</span>
+	  </span>
+	</span>
+	<span class="org vcardline">Adobe</span>
+	<span class="adr">
+	  
+	  <span class="vcardline">
+		<span class="locality"></span> 
+		<span class="region"></span>
+		<span class="code"></span>
+	  </span>
+	  <span class="country-name vcardline"></span>
+	</span>
+	<span class="vcardline">EMail: <a href="mailto:masinter@adobe.com">masinter@adobe.com</a></span>
+
+<span class="vcardline">URI: <a href="http://larry.masinter.net">http://larry.masinter.net</a></span>
+
+  </address>
+</div>
+
+</body>
+</html>

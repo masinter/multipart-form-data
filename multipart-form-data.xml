@@ -12,7 +12,7 @@
   <!ENTITY w3c.html5 PUBLIC '' 'reference.W3C.CR-html5-20121217.xml'>
 ]>
 
-<rfc ipr='trust200902' docName='draft-masinter-multipart-form-data-03'
+<rfc ipr='trust200902' docName='draft-masinter-multipart-form-data-04'
      obsoletes='2388' category='std'
      >
   <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
@@ -91,7 +91,7 @@
 	In forms, there are a series of fields to be supplied by the
 	user who fills out the form.  Each field has a name. Within a
 	given form, the names SHOULD be unique. After a form
-	has been "filled out" and "submitted" (processes defined
+	has been filled out and submitted (processes defined
 	by the form), the result is a set of values for each field-- 
 	the form-data. 
       </t>
@@ -141,9 +141,11 @@
 	  from a device, or where the file name is not user visible
 	  and would be unrecognized.)
 	</t>
+
 	<t>
 	  For compatibility with other multipart types, the value
-	  of the filename parameter MUST be restricted to US-ASCII.
+	  of the <spanx style="verb">filename</spanx>
+	  parameter MUST be restricted to US-ASCII.
 	  File names normally visible to users which contain
 	  non-ASCII characters SHOULD
 	  be encoded using the &amp;#nn; method described in
@@ -156,7 +158,7 @@
 	  If the value of a form field is a set of files rather than a
 	  single file, that value MUST be transmitted by supplying
 	  each in a separate part, but all with the same 
-	  <spanx style='verb'>name</spanx>, parameter. 
+	  <spanx style='verb'>name</spanx> parameter. 
 	</t>
       </section>
 	
@@ -174,7 +176,7 @@
 	<t>
 	  In the case where a field value is text,
 	  the charset parameter for the <spanx style='verb'>text/plain</spanx>
-	  <spanx style='verb'>Content-Type</spanx>
+	  Content-Type
 	  may be used to indicate the character encoding used in that part.
 	  For example, a form with a text field in which a user typed
 	  "Joe owes &lt;eu&gt;100" where &lt;eu&gt; is the Euro symbol
@@ -183,10 +185,10 @@
 	<figure><artwork>
 	  --AaB03x
 	  content-disposition: form-data; name="field1"
-	  content-type: text/plain;charset=windows-1250
+	  content-type: text/plain;charset=UTF-8
 	  content-transfer-encoding: quoted-printable
 	    
-	  Joe owes =80100.
+	  Joe owes =E2=82=AC100.
 	  --AaB03x
 	</artwork></figure>
       </section>
@@ -368,8 +370,8 @@
 	an unintended third party, or private information to be sent
 	to someone that the user might not actually intend. While this
 	is primarily an issue for the representation and
-	interpretation of forms themselves, rather than the data
-	representation of the result of form data, the
+	interpretation of forms themselves (rather than the data
+	representation of the form data),  the
 	transportation of private information must be done in a way
 	that does not expose it to unwanted prying.
       </t>
