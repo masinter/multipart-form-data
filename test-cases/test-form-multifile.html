@@ -7,9 +7,23 @@
 
 
 
-<form action="http://www.posttestserver.com/post.php?dump&html&dir=multipart-test" method="post" enctype="multipart/form-data">
+<form action="http://httpbin.org/post" method="post" enctype="multipart/form-data">
+ 
+ <p>This is the first form, going to httpbin.org</p>
+
+ <input type=file multiple="multiple" size=40 name="submitted">
+ <input type=hidden name=test value=text>
+ <input type=submit>
+</form>
+
+ <hr />
+
+<form action="http://requestb.in/vqa5nqvq" method="post" enctype="multipart/form-data">
+<p>This is the second form, the results get uploaded to <a href="http://requestb.in/vqa5nqvq?inspect">here</a>. </p>
  
  <input type=file multiple="multiple" size=40 name="submitted">
  <input type=hidden name=test value=text>
  <input type=submit>
 </form>
+
+
