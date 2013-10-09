@@ -134,10 +134,11 @@
 	<t>
 	  For form data that represents the content of a local file,
 	  a name for the file SHOULD be supplied as well, by using a
-	  "filename" parameter of the Content-Distribution header.
-	  (The SHOULD is to allow file uploads that result from 
+	  <spanx style='code'>filename</spanx> parameter of the
+	  <spanx style='code'>Content-Disposition</spanx> header.
+	  (The "SHOULD" is to allow file uploads that result from 
 	  drag-and-drop in systems where the file name is meaningless
-	  or private, where the uploaded content is streamed directly
+	  or private, where the uploaded> content is streamed directly
 	  from a device, or where the file name is not user visible
 	  and would be unrecognized.)
 	</t>
