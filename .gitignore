@@ -1,19 +1,10 @@
-<<<<<<< HEAD
+# emacs detritus
+*~
+*#
+
 # don't ignore output of xml2rfc conversion
-# plain text conversions
-# don't ignore 
 # multi*.txt
 # multi*.html
 # multi*.pdf
 
-# emacs detritus
-*~
-*#
-=======
-# do NOT ignore output of xml2rfc conversion
-# just check in every time
-# following are commented out
-# multi*.txt
-# multi*.html
-# multi*.pdf
 
