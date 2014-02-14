@@ -81,23 +81,37 @@
 	for which it is used.
       </t>
     </section>
+    <section title="Form requirements">
+      <t>
+	The representation and interpretation of forms is not
+	specified by this document, although some constraints
+        are imposed.
+      </t>
+      <t>
+	In a form, there are a series of fields to be supplied by the
+	user who fills out the form.  Each field has a name.  After a
+	form has been filled out, when the user requests the form be
+	submitted (processes defined by the form), the result is a set
+	of values for each field-- the form-data.
+      </t>
+      <t>
+	Field names are Unicode strings. Within a given
+	form, the field  names SHOULD be unique. Some fields
+        may have default values or presupplied values in the
+        form itself. Fields with presupplied values may be hidden.
+      </t>
+    </section>
     <section title='Definition of multipart/form-data'>
       <t>
 	The media-type multipart/form-data generally follows the model
 	of multipart MIME data streams as described in <xref
 	target='RFC2046'/> Section 5.1.
       </t>
-      <t>
-	In forms, there are a series of fields to be supplied by the
-	user who fills out the form.  Each field has a name. Within a
-	given form, the names SHOULD be unique. After a form
-	has been filled out and submitted (processes defined
-	by the form), the result is a set of values for each field-- 
-	the form-data. 
-      </t>
+
       <t>
 	A <spanx style='verb'>multipart/form-data</spanx> body
-	contains a series of parts. Each part MUST contain a <spanx
+	contains a series of parts.
+	Each part MUST contain a <spanx
 	style='verb'>Content-Disposition</spanx> header <xref
 	target='RFC2183'/> where the disposition type is <spanx
 	style='verb'>form-data</spanx>, and where the disposition
@@ -106,7 +120,6 @@
 	original field name from the form (encoded, see <xref
 	target='non-ascii-fields'/>).  For example, a part might
 	contain a header:
-      
 
       <figure><artwork>
         Content-Disposition: form-data; name="user"
@@ -200,7 +213,22 @@
 	and type <spanx style='verb'>hidden</spanx> is automatically
         set to the name of the form-charset. In this case, the value
         of the default charset of each text/plain part without a
-        charset parameter is the supplied value.</t>
+        charset parameter is the supplied value. For example:</t>
+	
+	<figure><artwork>
+	  --AaB03x
+	  content-disposition: form-data; name="_charset_"
+	  content-type: text/plain
+	    
+	  iso8859-1
+	  --AaB03x--
+	  content-type: text/plain
+	  content-disposition: form-data; name="field1"
+	  
+	  abcdefghijklmnopqrstuvwxyz
+	  AaB03x--
+	</artwork></figure>
+
       </section>
 
       <section title="Content-Transfer-Encoding">
@@ -489,32 +517,47 @@
     </references>
     <section title="Changes from RFC 2388">
 
-      <t>The handling of multiple files submitted as the result of a
-      single form field (e.g., HTML's &lt;input type=file multiple&gt;
-      element) results in each file having its own top level part with
-      the same name parameter; the method of using a nested
-      <spanx style='verb'>multipart/mixed</spanx>
-      from <xref target="RFC2388"/> is not
-      recommended.</t>
+      <ul>
+	<li>
+	  The handling of non-ASCII field names changed-- no longer
+	  recommending the RFC 2047 method, instead requiring
+          UTF8.
+	  Few if any implemented the =?charset:string?= method
+	  of <xref target="RFC2047"/>.
+	</li>
 
-      <t>The _charset_ convention and use of an explicit form-data
-      charset is documented.</t>
+	<li>
+	  The handling of multiple files submitted as the result of a
+	  single form field (e.g., HTML's &lt;input type=file multiple&gt;
+	  element) results in each file having its own top level part with
+	  the same name parameter; the method of using a nested
+	  <spanx style='verb'>multipart/mixed</spanx>
+	  from <xref target="RFC2388"/> is not
+	  recommended.
+	</li>
+	<li>
+	  The _charset_ convention and use of an explicit form-data
+	  charset is documented.
+	</li>
+	<li>'boundary' is a required parameter in Content-Type.
 
-      <t>The handling of non-ASCII field names is changed significantly.
-      Few if any implemented the =?charset:string?= method
-      of <xref target="RFC2047"/>.
-      </t>
+	<li>
+	  The relationship of the ordering of fields within a form and
+	  the ordering of returned values within multipart/form-data was
+	  not defined before, nor was the handling of the case where a
+	  form has multiple fields with the same name.
+	</li>
 
-      <t>The relationship of the ordering of fields within a form and
-      the ordering of returned values within multipart/form-data was
-      not defined before, nor was the handling of the case where a
-      form has multiple fields with the same name. </t>
+      <li>More prescriptive about order and duplicates: 
+         </li>
 
-      <t>More prescriptive about order and duplicates.</t>
-
-      <t>Remove obsolete discussion of alternatives.</t>
-
-
+      <li>Editorial:
+	  Removed obsolete discussion of alternatives in
+	  appendix. 
+	  Update references. Move outline of form processing
+          into Introduction.
+      </li>
+      </ul>
     </section>
 
     <section title="Alternatives">
