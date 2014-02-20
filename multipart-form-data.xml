@@ -12,7 +12,7 @@
   <!ENTITY w3c.html5 PUBLIC '' 'reference.W3C.CR-html5-20121217.xml'>
 ]>
 
-<rfc ipr='trust200902' docName='draft-ietf-appsawg-multipart-form-data-00'
+<rfc ipr='trust200902' docName='draft-ietf-appsawg-multipart-form-data-01'
      obsoletes='2388' category='std'
      >
   <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
@@ -43,16 +43,17 @@
 	filling out a form.  It replaces RFC 2388.
       </t>
     </abstract>
-    <note title='NOTE'>
-      <t>There is a GitHub repository for this draft at
+
+  </front>
+  <middle>
+    <section title='NOTE'>
+       <t>There is a GitHub repository for this draft at
       https://github.com/masinter/multipart-form-data along with an
       issue tracker. This specification has been proposed as a work
       item of the APPSAWG Applications Area working group,
       apps-discuss@ietf.org. Please raise issues in the tracker, or
       send to the apps-discuss list.</t>
-    </note>
-  </front>
-  <middle>
+    </section>
     <section title='Introduction'>
       <t>
 	In many applications, it is possible for a user to be
@@ -516,17 +517,15 @@
 
     </references>
     <section title="Changes from RFC 2388">
-
-      <ul>
-	<li>
+      <t>
 	  The handling of non-ASCII field names changed-- no longer
 	  recommending the RFC 2047 method, instead requiring
           UTF8.
 	  Few if any implemented the =?charset:string?= method
-	  of <xref target="RFC2047"/>.
-	</li>
-
-	<li>
+  of <xref target="RFC2047"/>.
+	</t>
+	
+	<t>
 	  The handling of multiple files submitted as the result of a
 	  single form field (e.g., HTML's &lt;input type=file multiple&gt;
 	  element) results in each file having its own top level part with
@@ -534,30 +533,27 @@
 	  <spanx style='verb'>multipart/mixed</spanx>
 	  from <xref target="RFC2388"/> is not
 	  recommended.
-	</li>
-	<li>
+	</t>
+	<t>
 	  The _charset_ convention and use of an explicit form-data
 	  charset is documented.
-	</li>
-	<li>'boundary' is a required parameter in Content-Type.
-
-	<li>
+	</t>
+	<t>
+	'boundary' is a required parameter in Content-Type.
+	</t>
+	<t>
 	  The relationship of the ordering of fields within a form and
 	  the ordering of returned values within multipart/form-data was
 	  not defined before, nor was the handling of the case where a
 	  form has multiple fields with the same name.
-	</li>
-
-      <li>More prescriptive about order and duplicates: 
-         </li>
-
-      <li>Editorial:
+	</t>
+	<t>
+	  Editorial:
 	  Removed obsolete discussion of alternatives in
 	  appendix. 
 	  Update references. Move outline of form processing
           into Introduction.
-      </li>
-      </ul>
+	</t>
     </section>
 
     <section title="Alternatives">
