@@ -1,0 +1,29 @@
+<!DOCTYPE HTML>
+<title>multipart/form-data and multiple files</title>
+<h1>Form submission multiple file tests</h1>
+<p>CONTROL: Expected result: <span id="expected">multiple entries</span>
+ <p>Result should have multiple entries for "file"</p>
+<h2>Enter multiple (small) file:</h2>
+
+
+
+<form action="http://httpbin.org/post" method="post" enctype="multipart/form-data">
+ 
+ <p>This is the first form, going to httpbin.org</p>
+
+ <input type=file multiple="multiple" size=40 name="submitted">
+ <input type=hidden name=test value=text>
+ <input type=submit>
+</form>
+
+ <hr />
+
+<form action="http://requestb.in/vqa5nqvq" method="post" enctype="multipart/form-data">
+<p>This is the second form, the results get uploaded to <a href="http://requestb.in/vqa5nqvq?inspect">here</a>. </p>
+ 
+ <input type=file multiple="multiple" size=40 name="submitted">
+ <input type=hidden name=test value=text>
+ <input type=submit>
+</form>
+
+

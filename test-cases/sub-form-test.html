@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html>
+  <body>
+    <form id="form" action="http://localhost:8888" method="POST" 
+	  enctype="multipart/form-data"
+	  >
+      <p>  here is the form </p>
+      <label for="first-field">FieldOne:</label>
+      <input type="text" name="first-field" value="Field One Text">
+      <br>
+      <label for="second-field">FieldTwo:</label>
+      <input type="text" name="second-field" value="Field Two Text">
+      <br>
+      <input type="submit" value="Submit">
+    </form>
+    <script>
+      document.getElementById("form").submit();
+    </script>
+  </body>
+</html>

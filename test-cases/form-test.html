@@ -1,0 +1,81 @@
+<!DOCTYPE HTML>
+<!-- 
+
+     Load a form into an iframe, the form auto submits,
+     sending its form data to node-server.js.  The server sends a
+     message back that contains JSON for the request, including
+     headers, URL, method, and the 'body' 
+    
+     testharness.js is used to check the message sent back from the
+     server against required values.  The results of this
+    comparison are displayed using the div with id="log".
+-->
+<html>
+  <head>
+    <script src="resources/testharness.js"></script>
+    <script src="resources/testharnessreport.js"></script>
+  </head>
+
+  <body>
+    <h2>Various Form Tests</h2>
+    <iframe id="form-frame" width="90%"></iframe>
+    <div id="log">
+      Log goes here
+    </div>
+    <script>			
+    
+      // sample to show testing works
+      test(function() {assert_true(true)}, "assert_true with true")
+      
+      // here's the real test
+
+      var test = async_test("Verify multipart/form-data Data");
+
+      test.step(function () {
+      function receiveMessage(e) {
+      var eventObj = JSON.parse(e.data);
+
+      assert_equals(eventObj.httpVersion, "1.1", "using HTTP/1.1");
+      assert_equals(eventObj.method, "POST", "Method is POST");
+      
+      var contentType = eventObj.headers["content-type"]; 
+
+      var ctPattern = /^multipart\/form-data; boundary=(.*)$/
+
+      assert_regexp_match(
+         contentType,
+         ctPattern,
+         "content-type is multipart/form-data with boundary");
+
+      var mpMatch = contentType.match(ctPattern);
+      assert_equals(mpMatch.length, 2, "match once");
+      var boundary = mpMatch[1];
+
+      // <!-- 
+      //      if (boundary.charAt(0) === "'" || boundary.charAt(0) === '"') {
+      //        assert_equal(boundary.charAt(0), boundary.charAt(boundary.length-1));
+      //        boundary = boundary.slice(1, -1);
+      //      }
+      // --> 
+
+      var body = eventObj.body.split("--" + boundary + "--");
+
+
+      //            assert_greater_than(body.length, 0, "at least one body part");
+      // var boundedRE = new RegExp("/\--" + boundary +
+      // ".+" + 
+      // "(--" + boundary + "--\r\n)+" +
+      // assert_equals(e.data, "first-field=Field+One+Text&second-field=Field+Two+Text");
+      // -->
+
+      test.done(); 
+
+      }
+		  
+      window.addEventListener("message", test.step_func(receiveMessage));
+      var formFrame = document.getElementById("form-frame");
+      formFrame.src = "sub-form-test.html";
+      }); 
+    </script>
+  </body>
+</html>
