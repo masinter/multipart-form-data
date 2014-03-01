@@ -12,7 +12,7 @@
   <!ENTITY w3c.html5 PUBLIC '' 'reference.W3C.CR-html5-20121217.xml'>
 ]>
 
-<rfc ipr='trust200902' docName='draft-ietf-appsawg-multipart-form-data-01'
+<rfc ipr='trust200902' docName='draft-ietf-appsawg-multipart-form-data-02'
      obsoletes='2388' category='std'
      >
   <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
@@ -141,6 +141,12 @@
 	  <figure><artwork>
 	    multipart/form-data;boundary="-AaB03x"
 	  </artwork></figure>
+	</t>
+	<t>Note that many implementations do not quote the boundary
+	parameter, e.g.,
+	<figure><artwork>
+	  multipart/form-data;boundary="-AaB03x"
+	</artwork></figure>
 	</t>
       </section>
       
