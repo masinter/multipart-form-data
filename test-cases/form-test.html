@@ -34,40 +34,16 @@ var test = async_test("Verify multipart/form-data Data");
 
 test.step(function () {
     function receiveMessage(e) {
-	var eventObj = JSON.parse(e.data);
-	assert_equals(eventObj.httpVersion, "1.1", "using HTTP/1.1");
-	assert_equals(eventObj.method, "POST", "Method is POST");
-
-
-	var contentType = eventObj.headers["content-type"]; 
-	var ctPattern = /^multipart\/form-data; boundary=(.*)$/
-	    
-	assert_regexp_match(
-            contentType,
-            ctPattern,
-            "content-type is multipart/form-data with boundary");
-	
-	var mpMatch = contentType.match(ctPattern);
-	assert_equals(mpMatch.length, 2, "match once");
-	var boundary = mpMatch[1];
-
-	if (boundary.charAt(0) === "'" || boundary.charAt(0) === '"') {
-	    assert_equals(boundary.charAt(0),
-			  boundary.charAt(boundary.length-1));
-	    boundary = boundary.slice(1, -1);
-	}
-
-	var parsedParts = form_test.parseMultipart(eventObj.body, boundary);
-	
-
+	var parsedParts = form_test.processResponse(JSON.parse(e.data));
+	debugger;
 	test.done(); 
-}
-		  
-      window.addEventListener("message", test.step_func(receiveMessage));
-      var formFrame = document.getElementById("form-frame");
-      formFrame.src = "sub-form-test.html";
-
-      }); 
+    }
+    window.addEventListener("message", test.step_func(receiveMessage));
+    var formFrame = document.getElementById("form-frame");
+    formFrame.src = "sub-form-test.html";
+}); 
     </script>
   </body>
 </html>
+
+
