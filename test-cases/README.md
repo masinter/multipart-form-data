@@ -7,7 +7,7 @@ by Hixie to test multipart/form-data.
 
 Still in progress is to
 1. complete the test harness to actually check the syntax 
-2. convert Hixie's tests to this framework
+2. convert Hixie's tests (in 'old') to this framework
 3. develop additional test cases for proposed changes from published RFC.
 
 The current architecture for the test suite is from
@@ -24,6 +24,8 @@ To run this, you need [nodejs](http://nodejs.org/)
 # How it works
 
 * The form-test.html file is the test file    
+* form-test.js contains shared library
+* the 'resources' files (testharness.js and testharnessreport.js) come from the W3C test framework in github.
 * node-server.js sets up a simple web server on port 8888
 * form-test.html loads the form from sub-form-test.html into an iframe
 * The form auto-submits and sends its data, via POST, to node-server.js

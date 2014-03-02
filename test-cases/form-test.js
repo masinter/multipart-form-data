@@ -4,29 +4,38 @@ var form_test = {
     	assert_equals(eventObj.method, "POST", "Method is POST");
 	
     	var contentType = eventObj.headers["content-type"]; 
-    	var ctPattern = /^multipart\/form-data; boundary=(.*)$/
-	    
-    	assert_regexp_match(
-            contentType,
-            ctPattern,
-            "content-type is multipart/form-data with boundary");
-	
-    	var mpMatch = contentType.match(ctPattern);
-    	assert_equals(mpMatch.length, 2, "match once");
 
-    	var boundary = mpMatch[1];
-	
-    	if (boundary.charAt(0) === '"') {
-    	    assert_equals(boundary.charAt(0),
-    			  boundary.charAt(boundary.length-1));
-    	    boundary = boundary.slice(1, -1);
-    	}
+	var matchParam = (function(orig, expectValue, expectParam, source) {
+	    var valuePattern = new RegExp("^" + expectValue + "; *" +
+					  expectParam + "= *(.*)$");
+
+    	    assert_regexp_match(
+		orig,
+		valuePattern,
+		source + " should be " + expectValue + " with " +
+		    expectParam + " parameter");
+
+	    var valueMatch = orig.match(valuePattern);
+    	    assert_equals(valueMatch.length, 2, "match once");
+	    var paramValue = valueMatch[1];
+    	    if (paramValue.charAt(0) === '"') {
+    		assert_equals(paramValue.charAt(0),
+    			      paramValue.charAt(paramValue.length-1),
+			     "properly delimited parameter");
+    		paramValue = paramValue.slice(1, -1);
+    	    }
+	    return paramValue;
+	});
+
+	var boundary = matchParam(eventObj.headers["content-type"],
+				  "multipart/form-data", "boundary",
+				  "content-type header");
 
 	var raw = "(phoney preface)\r\n" + eventObj.body;
 	var bodyParts = raw.split("\r\n--" + boundary + "\r\n");
 	var bpl = bodyParts.length;
 
-	assert_greater_than(bpl, 1, "at least one body part");
+	assert_greater_than(bpl, 1, "must have at least one body part");
 	
 	var lastPart = bodyParts[bpl-1]; 
 	assert_greater_than(lastPart.length, 6+boundary.length, 
@@ -40,37 +49,52 @@ var form_test = {
 		      "multipart ends with boundary line");
 	
 	bodyParts[bpl-1] = lastPart.slice(0, -(boundary.length + 8));
-      
-	var parsedBody = {};
-	var parseMPFD = function (part) {
-	}
-
 	var parsedParts = [];
-	var headers = {};
-	var headerName = "";
-	var header = [];
-	var part = "";
 
-	var headerRegExp = /^(content-disposition|content-type|content-transfer-encoding): (.*)\r\n/i ;
+	var parsePart = (function(part) {
+	    var header = {};
+	    var headerRegExp = /^([-a-z]+): (.*)\r\n/i ;
+	    var headerParse = part.match(headerRegExp);
+	    
+	    while (headerParse) {
+		part = part.slice(headerParse[0].length);
+		switch (headerParse[1].toLowerCase()) {
 
-	for (var index = 1; index < bpl; index++) {
-	    headers = {};
-	    part = bodyParts[index];
-	    header = part.match(headerRegExp);
-	    headerName = "";
-	    while (header) {
-		part = part.slice(header[0].length);
-		headerName = header[1].toLowerCase();
-		headers[headerName] = header[2];
-		header = part.match(headerRegExp);
+		case 'content-disposition':
+		    header['fieldName'] =
+			matchParam(headerParse[2],
+				   "form-data",
+				   "name",
+				   "part's content-disposition header");
+		    break;
+		    
+		case 'content-type':
+		    header['content-type'] = headerParse[2];
+		    break;
+		    
+		case 'content-transfer-encoding':
+		    // TODO: validate
+		    header['content-transfer-encoding'] = headerParse[2];
+		    break;
+		    
+		default:
+		    assert_true(false, "disallowed header: " + headerParse[1]);
+		    break;
+		}
+		
+		headerParse = part.match(headerRegExp);
 	    }
 	    
-	    assert_regexp_match(part, /^\r\n/, "unrecognized headers");
-	    headers.body = part.slice(2);  // remove CRLF
-	    parsedParts.push(headers);
+	    header.body = part.slice(2);  // remove CRLF from what's left over
+	    return header;
+	});
+
+
+	for (var index = 1; index < bpl; index++) {
+	    parsedParts.push(parsePart(bodyParts[index]));
 	}
-	
 	return parsedParts;
     }
 }
-    
+
+
