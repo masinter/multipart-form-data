@@ -4,10 +4,6 @@
 <p>This page specifies no particular encoding.</p>
 <p>CONTROL: Expected result: <span id="expected">Windows-1252</span>
 <div>
- <style scoped>
-  .pass { background: green; color: white; padding: 0.5em; font-weight: bold; }
-  .fail { background: red; color: yellow; padding: 0.5em; font-weight: bold; }
- </style>
  <p>Encoding used by browser is: <span id="encoding">Script did not run.</span>
  <p>Result: <span id="result">Script did not run.</span>
  <script>
@@ -92,7 +88,11 @@
 
 <h2>Subtest C2</h2>
 <p>Unicode-safe data in value: name=test&amp;#x263a; value=text</p>
-<form action="http://www.posttestserver.com/post.php?dump&html&dir=multipart-test" method="post" enctype="multipart/form-data">
- <input type=hidden name=test&#x263A; value=text>
+
+
+<form action="http://localhost:8888"
+      method="post"
+      enctype="multipart/form-data">
+ <input name=test&#x263A; value=text>
  <input type=submit>
 </form>
