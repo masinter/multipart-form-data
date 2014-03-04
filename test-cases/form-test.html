@@ -1,4 +1,14 @@
 <!DOCTYPE HTML>
+<!-- -*- coding: utf-8 -*-  -->
+
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <script src="resources/testharness.js"></script>
+    <script src="resources/testharnessreport.js"></script>
+    <script src="form-test.js"></script>
+  </head>
+
 <!-- 
 Load a form into an iframe. The form auto submits, sending its form
 data to node-server.js.  The server sends a message back that contains
@@ -9,41 +19,47 @@ against required values.  The results of this comparison are displayed
 using the div with id="log".
 -->
 
-<html>
-  <head>
-    <script src="resources/testharness.js"></script>
-    <script src="resources/testharnessreport.js"></script>
-    <script src="form-test.js"></script>
-  </head>
-
   <body>
-    <h2>Various Form Tests</h2>
+    <h2>Multipart-Form-Data Form Tests</h2>
     <iframe id="form-frame" width="50%"></iframe>
     <div id="log">
-      Log goes here
+      Log would go here if there were one.
     </div>
 
     <script>			
-    
+
 // sample to show testing works
 test(function() {assert_true(true)}, "assert_true with true")
 
-// here's the real test
-var test = async_test("Verify multipart/form-data Data");
+// here are some real tests
+var testValues = {
+    "sub-form-test": [{fieldName: "first-field", body: "Field One Text"},
+    		      {fieldName: "second-field", body: "Field Two Text"}]
+//    ,
+//    "sub-form-test-01": 
+//           [{fieldName: "first-field", body: "Field One Téxt"},
+//	      {fieldName: "second-field", body: "Field Two T&eacute;xt"}]
+};
 
-test.step(function () {
-    function receiveMessage(e) {
-	var parsedParts = form_test.processResponse(JSON.parse(e.data));
-	assert_object_equals(parsedParts, 
-			     [{fieldName: "first-field", body: "Field One Text"},
-			      {fieldName: "second-field", body: "Field Two Text"}],
-			     "Successful multipart test");
-	test.done(); 
-    }
-    window.addEventListener("message", test.step_func(receiveMessage));
-    var formFrame = document.getElementById("form-frame");
-    formFrame.src = "sub-form-test.html";
-}); 
+var formFrame = document.getElementById("form-frame");
+
+for (var testName in testValues) {
+    // nested function so each test is separate
+    (function testing () {
+	var test = async_test("Multipart/form-data test " + testName);
+	test.step(function () {
+	    function receiveMessage(e) {
+		var parsedParts = form_test.processResponse(JSON.parse(e.data));
+		assert_object_equals(parsedParts, 
+				     testValues[testName],
+				     "multipart test " + testName);
+		test.done(); 
+	    }
+	    window.addEventListener("message", test.step_func(receiveMessage));
+	    formFrame.src = testName + ".html";
+	})
+    })()
+};
     </script>
   </body>
 </html>

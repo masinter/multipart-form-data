@@ -1,19 +1,19 @@
+/*jslint indent: 4, node: true, sloppy: true, vars: true */
+
 var http = require('http');
+var port = 8888;
 
 http.createServer(function (request, response) {
 
     // subset properties to ones that might be useful
-
     var qReq = {};
     var props = ["httpVersion", "headers", "trailers",
-		 "method", "url"];
-    for(var index = 0; index < props.length; index++) {
+		         "method", "url"];
+    for (var index = 0; index < props.length; index++) {
 	var prop = props[index];
 	qReq[prop] = request[prop];
     }
     
-    // console.log("Request: " + JSON.stringify(qReq));
-
     response.writeHead(200, "OK", {'Content-Type': 'text/html', 'Access-Control-Allow-Origin':'*'});
 
     var encodingData = "";
@@ -26,9 +26,10 @@ http.createServer(function (request, response) {
 	qReq.body = encodingData;
 	response.write('Done\n<script>window.parent.postMessage(');
 	response.write('JSON.stringify(');
-	response.write(JSON.stringify(qReq));  // double quote gets unwound in client
+	// double quote gets unwound in client
+	response.write(JSON.stringify(qReq, null, 2)); 
 	response.write('), "*"); </script>');
 	response.end();
     });
-}).listen(8888);
-console.log('Server running on port 8888');
+}).listen(port);
+console.log('Server running on port ' + port);

@@ -5,10 +5,9 @@ This is still under development. This directory contains the beginning
 of a form test harness, plus some previous files originally devloped
 by Hixie to test multipart/form-data.
 
-Still in progress is to
-1. complete the test harness to actually check the syntax 
-2. convert Hixie's tests (in 'old') to this framework
-3. develop additional test cases for proposed changes from published RFC.
+Still in progress is to:
+1. convert Hixie's tests (in 'old') to this framework
+2. develop additional test cases for proposed changes from published RFC.
 
 The current architecture for the test suite is from
 Jacob Goldstein <jacobg@adobe.com>, thanks!
