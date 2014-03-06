@@ -24,11 +24,11 @@ http.createServer(function (request, response) {
 
     request.on('end', function() {
 	qReq.body = encodingData;
-	response.write('Done\n<script>window.parent.postMessage(');
+	response.write('<html><head><meta charset=utf-8></head><body><p>Done\n<script>window.parent.postMessage(');
 	response.write('JSON.stringify(');
 	// double quote gets unwound in client
 	response.write(JSON.stringify(qReq, null, 2)); 
-	response.write('), "*"); </script>');
+	response.write('), "*"); </script></body>');
 	response.end();
     });
 }).listen(port);
