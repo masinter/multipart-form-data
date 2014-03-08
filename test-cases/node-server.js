@@ -22,13 +22,28 @@ http.createServer(function (request, response) {
 	encodingData += chunk.toString();
     });
 
+    var debugging = true;
+
     request.on('end', function() {
+	response.write('<html><head><meta charset=utf-8></head><body>' +
+		       '<h2>POSTed request</h2><pre>');
+	if (debugging) {
+	    // echo results in response to POST for visual confirmation
+	    // unnecessary for automated testing
+	    var ed = encodingData.split("\r\n");
+	    response.write(JSON.stringify(qReq, null, 2));
+	    response.write("\n\nBody:\n");
+	    for (var i=0; i<ed.length; i++) {
+		response.write("\n  "+JSON.stringify(ed[i]).slice(1,-1));
+	    }
+	}
+	response.write('\n\n</pre>');
 	qReq.body = encodingData;
-	response.write('<html><head><meta charset=utf-8></head><body><p>Done\n<script>window.parent.postMessage(');
+	response.write('<script>window.parent.postMessage(');
 	response.write('JSON.stringify(');
 	// double quote gets unwound in client
-	response.write(JSON.stringify(qReq, null, 2)); 
-	response.write('), "*"); </script></body>');
+	response.write(JSON.stringify(qReq)); 
+	response.write('), "*"); </script></body></html>');
 	response.end();
     });
 }).listen(port);

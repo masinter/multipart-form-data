@@ -7,7 +7,6 @@
   <!ENTITY rfc.1806 PUBLIC '' 'reference.RFC.1806.xml'>
   <!ENTITY rfc.1867 PUBLIC '' 'reference.RFC.1867.xml'>
   <!ENTITY rfc.2183 PUBLIC '' 'reference.RFC.2183.xml'>
-  <!ENTITY rfc.2184 PUBLIC '' 'reference.RFC.2184.xml'>
   <!ENTITY rfc.2388 PUBLIC '' 'reference.RFC.2388.xml'>
   <!ENTITY w3c.html5 PUBLIC '' 'reference.W3C.CR-html5-20121217.xml'>
 ]>
@@ -104,9 +103,11 @@
     </section>
     <section title='Definition of multipart/form-data'>
       <t>
-	The media-type multipart/form-data generally follows the model
-	of multipart MIME data streams as described in <xref
-	target='RFC2046'/> Section 5.1.
+	The media-type <spanx
+	style='verb'>multipart/form-data</spanx> generally follows the
+	model of multipart MIME data streams as described in <xref
+	target='RFC2046'/> Section 5.1, although common
+	implementations vary, as noted in this document.
       </t>
 
       <t>
@@ -114,6 +115,7 @@
 	contains a series of parts.
 	Each part MUST contain a <spanx
 	style='verb'>Content-Disposition</spanx> header <xref
+	target='RFC1806'/> <xref
 	target='RFC2183'/> where the disposition type is <spanx
 	style='verb'>form-data</spanx>, and where the disposition
 	contains an (additional) parameter of <spanx
@@ -363,7 +365,7 @@
 	  compact, e.g.:
 	</t>
 	<figure><artwork>
-	  name=Xavier+Xantico&amp;verdict=Yes&amp;colour=Blue&amp;happy=sad&amp;Utf%F6r=Send
+   name=Xavier+Xantico&amp;verdict=Yes&amp;colour=Blue&amp;happy=sad&amp;Utf%F6r=Send
 	</artwork></figure>
 	<t>
 	  However, there is no opportunity to label the enclosed
@@ -460,7 +462,6 @@
       &rfc.2231;
       &rfc.1806;
       &rfc.2183;
-      &rfc.2184;
       
     </references>
     <references title="Informative References">

@@ -1,30 +1,47 @@
 Test harness for multipart/form-data
 =================
 
-This is still under development. This directory contains the beginning
-of a form test harness, plus some previous files originally devloped
-by Hixie to test multipart/form-data.
+This directory contains the beginning of a form test harness.
+
 
 Still in progress is to:
 1. convert Hixie's tests (in 'old') to this framework
 2. develop additional test cases for proposed changes from published RFC.
 
+Test cases needed:
+------------------
+* boundary quoted? Media type paramters are supposed to be quoted, 
+  but most implementations don't seem to quote 'boundary'. This is
+  not in multipart/from-data itself.
+* name and filename quoted?
+
+* non-ascii: try UTF-8, chinese, japanese
+  non-ascii field names
+  non-ascii field values
+  non-ascii file name
+  non-text file content
+  multiple files
+
+
 The current architecture for the test suite is from
-Jacob Goldstein <jacobg@adobe.com>, thanks!
+Jacob Goldstein <jacobg@adobe.com> with additional help
+from Philippe Le Hegaret <plh@w3.org>   thanks!
 
 To run this, you need [nodejs](http://nodejs.org/)
 
 # Running the test example
+
 1. CD to the test-cases directory
 2. Start the server with the following command: 
-    ```node node-server.js &``
+	node node-server.js &
 3. Launch the form-test.html file in a browser
 
 # How it works
 
-* The form-test.html file is the test file    
-* form-test.js contains shared library
-* the 'resources' files (testharness.js and testharnessreport.js) come from the W3C test framework in github.
+* The form-test.html file is the test file
+* form-test.js contains a form-test specific shared library
+* the 'resources' files (testharness.js and testharnessreport.js) come from the W3C web platform test framework
+	https://github.com/w3c/testharness.js
 * node-server.js sets up a simple web server on port 8888
 * form-test.html loads the form from sub-form-test.html into an iframe
 * The form auto-submits and sends its data, via POST, to node-server.js

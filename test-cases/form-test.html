@@ -23,7 +23,7 @@ using the div with id="log".
     <h2>Multipart-Form-Data Form Tests</h2>
     <iframe id="form-frame" width="50%"></iframe>
     <div id="log">
-      Log would go here if there were one.
+      Log goes here.
     </div>
 
     <script>			
@@ -33,12 +33,13 @@ test(function() {assert_true(true)}, "assert_true with true")
 
 // here are some real tests
 var testValues = {
-    "sub-form-test": [{fieldName: "first-field", body: "Field One Text"},
-    		      {fieldName: "second-field", body: "Field Two Text"}]
-//    ,
-//    "sub-form-test-01": 
-//           [{fieldName: "first-field", body: "Field One Téxt"},
-//	      {fieldName: "second-field", body: "Field Two T&eacute;xt"}]
+    "sub-form-test":
+    [{fieldName: "first-field", body: "Field One Text"},
+     {fieldName: "second-field", body: "Field Two Text"}]
+    ,
+    "sub-form-test-01": 
+    [{fieldName: "first-field", body: "Field One Téxt"},
+     {fieldName: "second-field", body: "Field Two T&eacute;xt"}]
 };
 
 var formFrame = document.getElementById("form-frame");

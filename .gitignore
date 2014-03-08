@@ -2,9 +2,12 @@
 *~
 *#
 
-# don't ignore output of xml2rfc conversion
-# multi*.txt
-# multi*.html
-# multi*.pdf
+# ignore output of md 
+README.html
+
+# ignore output of xml2rfc conversion
+multipart-form-data.txt
+multipart-form-data.html
+multipart-form-data.pdf
 
 
