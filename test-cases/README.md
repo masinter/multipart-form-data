@@ -8,21 +8,6 @@ Still in progress is to:
 1. convert Hixie's tests (in 'old') to this framework
 2. develop additional test cases for proposed changes from published RFC.
 
-Test cases needed:
-------------------
-* boundary quoted? Media type paramters are supposed to be quoted, 
-  but most implementations don't seem to quote 'boundary'. This is
-  not in multipart/from-data itself.
-* name and filename quoted?
-
-* non-ascii: try UTF-8, chinese, japanese
-  non-ascii field names
-  non-ascii field values
-  non-ascii file name
-  non-text file content
-  multiple files
-
-
 The current architecture for the test suite is from
 Jacob Goldstein <jacobg@adobe.com> with additional help
 from Philippe Le Hegaret <plh@w3.org>   thanks!
@@ -48,4 +33,22 @@ To run this, you need [nodejs](http://nodejs.org/)
 * node-server.js sends back a message containing a JSON object representing the request, including raw POST data it received
 * The async_test method from testharness.js is used to validate the data in the message
 * testharness.js outputs the results of the comparison to the div with id="log"
+
+
+Test cases needed:
+------------------
+* boundary quoted: Media type paramters are supposed to be quoted, 
+  but most implementations don't seem to quote 'boundary'. (This is
+  not in multipart/from-data itself, though)
+* Guessing the charset of the form:
+  
+* name and filename quoted?
+
+* non-ascii: try UTF-8, chinese, japanese
+  non-ascii field names
+  non-ascii field values
+  non-ascii file name
+  non-text file content
+  multiple files
+
 
