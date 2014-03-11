@@ -3,7 +3,7 @@
 var form_test = {
     processResponse: function (eventObj) {
         
-        assert_equals(eventObj.httpVersion, "1.1", "using HTTP/1.1");
+        // assert_equals(eventObj.httpVersion, "1.1", "using HTTP/1.1");
         assert_equals(eventObj.method, "POST", "Method is POST");
 	
         var contentType = eventObj.headers["content-type"];

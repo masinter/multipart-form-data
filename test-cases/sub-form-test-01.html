@@ -1,25 +1,18 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <meta charset=UTF-8">
+    <title>Form test</title>
+    <meta charset="UTF-8">
   </head>
   <body>
-    <form id="form" action="http://localhost:8888" method="POST" 
-	  enctype="multipart/form-data"
-	  >
-      <p>  here is the form </p>
-      <label for="first-field">FieldOne:</label>
-      <input type="text" name="first-field" value="Field One T&eacute;xt">
-      <br>
-      <label for="second-field">FieldTwo:</label>
-      <input type="text" name="second-field" value="Field Two Text">
-      <br>
+    <form id="form" action="http://localhost:8000/common/postecho.py" method="POST" 
+	  enctype="multipart/form-data">
+      <input type="text" name="first-field" value="Field One Text">
+      <input type="text" name="second-field" value="Field Two Téxt">
       <input type="submit" value="Submit">
     </form>
     <script>
-      var formElt = document.getElementById("form");
-      debugger;
-      formElt.submit();
+      document.getElementById("form").submit();
     </script>
   </body>
 </html>

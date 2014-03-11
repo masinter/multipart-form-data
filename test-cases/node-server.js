@@ -1,7 +1,7 @@
 /*jslint indent: 4, node: true, sloppy: true, vars: true */
 
 var http = require('http');
-var port = 8888;
+var port = 8000;
 
 http.createServer(function (request, response) {
 
