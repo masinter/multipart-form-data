@@ -11,7 +11,7 @@
 
 <!-- 
 Load a form into an iframe. The form auto submits, sending its form
-data to node-server.js.  The server sends a message back that contains
+data to the server.  The server sends a message back that contains
 JSON for the request, including headers, URL, method, and the 'body'
     
 testharness.js is used to check the message sent back from the server
@@ -23,24 +23,37 @@ using the div with id="log".
     <h2>Multipart-Form-Data Form Tests</h2>
     <iframe id="form-frame" width="50%"></iframe>
     <div id="log">
-      Log goes here.
+      Log would go here if there were one.
     </div>
 
-    <script>			
+    <script>
 
-// sample to show testing works
-test(function() {assert_true(true)}, "assert_true with true")
+function generateFrameContent(values) {
+    var content = '<html><head><title>Form test</title><meta charset="UTF-8"></head><body>'
+	+ '<form id="form" action="http://localhost:8000/common/postecho.py"'
+	+ ' method="POST" enctype="multipart/form-data">';
 
-// here are some real tests
+    values.forEach(function (obj) {
+	content += "<input type=text name='" + obj.fieldName
+	    + "' value='" + obj.body + "'>";
+    });
+
+    return content
+	+ '</form><script>document.getElementById("form").submit();<' + '/script>'
+	+ '</body></html>';
+}
+
 var testValues = {
-    "sub-form-test":
+    "one form value":
+    [{fieldName: "first-field", body: "Field One Text"}], 
+    "three form inputs": 
     [{fieldName: "first-field", body: "Field One Text"},
-     {fieldName: "second-field", body: "Field Two Text"}]
-    ,
-    "sub-form-test-01": 
-    [{fieldName: "first-field", body: "Field One Téxt"},
-     {fieldName: "second-field", body: "Field Two T&eacute;xt"}]
+     {fieldName: "second-field", body: "Field Two Téxt"},
+     {fieldName: "third-field", body: "Field Three Téxt"}]
 };
+
+/// send files from the file system
+/// (file name may contain non-ascii characters)
 
 var formFrame = document.getElementById("form-frame");
 
@@ -49,20 +62,21 @@ for (var testName in testValues) {
     (function testing () {
 	var test = async_test("Multipart/form-data test " + testName);
 	test.step(function () {
+	    var callback = null;
 	    function receiveMessage(e) {
 		var parsedParts = form_test.processResponse(JSON.parse(e.data));
 		assert_object_equals(parsedParts, 
 				     testValues[testName],
 				     "multipart test " + testName);
-		test.done(); 
+		test.done();
+		// window.removeEventListener("message", callback);
 	    }
-	    window.addEventListener("message", test.step_func(receiveMessage));
-	    formFrame.src = testName + ".html";
+	    callback = test.step_func(receiveMessage);
+	    window.addEventListener("message", callback);
+	    formFrame.srcdoc = generateFrameContent(testValues[testName]);
 	})
-    })()
+	})()
 };
     </script>
   </body>
 </html>
-
-

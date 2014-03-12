@@ -1,7 +1,7 @@
 /*jslint indent: 4, node: true, sloppy: true, vars: true */
 
 var http = require('http');
-var port = 8888;
+var port = 8000;
 
 http.createServer(function (request, response) {
 
@@ -22,22 +22,24 @@ http.createServer(function (request, response) {
 	encodingData += chunk.toString();
     });
 
-    var debugging = true;
+    var debugging = true; 
 
     request.on('end', function() {
-	response.write('<html><head><meta charset=utf-8></head><body>' +
-		       '<h2>POSTed request</h2><pre>');
+	response.write('<html><head><meta charset=utf-8></head><body>');
+
 	if (debugging) {
 	    // echo results in response to POST for visual confirmation
 	    // unnecessary for automated testing
+	    response.write('<h2>POSTed request</h2><pre>');
+
 	    var ed = encodingData.split("\r\n");
 	    response.write(JSON.stringify(qReq, null, 2));
 	    response.write("\n\nBody:\n");
 	    for (var i=0; i<ed.length; i++) {
 		response.write("\n  "+JSON.stringify(ed[i]).slice(1,-1));
 	    }
+	    response.write('\n\n</pre>');
 	}
-	response.write('\n\n</pre>');
 	qReq.body = encodingData;
 	response.write('<script>window.parent.postMessage(');
 	response.write('JSON.stringify(');
@@ -48,3 +50,4 @@ http.createServer(function (request, response) {
     });
 }).listen(port);
 console.log('Server running on port ' + port);
+
