@@ -30,15 +30,19 @@ http.createServer(function (request, response) {
 	if (debugging) {
 	    // echo results in response to POST for visual confirmation
 	    // unnecessary for automated testing
-	    response.write('<h2>POSTed request</h2><pre>');
-
+	    response.write('<h2>Request data</h2><pre>');
+	    console.log('request received');
 	    var ed = encodingData.split("\r\n");
 	    response.write(JSON.stringify(qReq, null, 2));
+	    console.log(JSON.stringify(qReq, null, 2));
 	    response.write("\n\nBody:\n");
+	    console.log('Body');
 	    for (var i=0; i<ed.length; i++) {
 		response.write("\n  "+JSON.stringify(ed[i]).slice(1,-1));
+		console.log(' ' + JSON.stringify(ed[i]).slice(1,-1));
 	    }
 	    response.write('\n\n</pre>');
+	    console.log('----------------');
 	}
 	qReq.body = encodingData;
 	response.write('<script>window.parent.postMessage(');

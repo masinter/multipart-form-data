@@ -21,62 +21,89 @@ using the div with id="log".
 
   <body>
     <h2>Multipart-Form-Data Form Tests</h2>
-    <iframe id="form-frame" width="50%"></iframe>
-    <div id="log">
-      Log would go here if there were one.
-    </div>
+    <hr />
 
+    <div id="form-add">
+    </div>
+    <div id="log">
+    Log goes here.
+    </div>
+    <hr />
     <script>
 
-function generateFrameContent(values) {
-    var content = '<html><head><title>Form test</title><meta charset="UTF-8"></head><body>'
-	+ '<form id="form" action="http://localhost:8000/common/postecho.py"'
-	+ ' method="POST" enctype="multipart/form-data">';
+var echoServer = 'http://localhost:8000/common/postecho.py';
 
-    values.forEach(function (obj) {
-	content += "<input type=text name='" + obj.fieldName
-	    + "' value='" + obj.body + "'>";
+function generateFrameContent(td) {
+    var cnt = '<html>\n<head>\n<title>Form Test ' +
+	td.testName +
+	'</title>\n<meta charset=utf8></head>' +
+	'<body><h1>subframe ' + td.testName + '</h1>\n' +
+	'<form id="form" action="' +
+	echoServer + '?test=' +	td.testName +
+	'" method="POST" enctype="multipart/form-data">\n';
+    
+    td.testFields.forEach(function (obj) {
+	cnt += '<input type=text name="' + obj.fieldName + 
+	    '" value="' + obj.body + '">\n';
     });
 
-    return content
-	+ '</form><script>document.getElementById("form").submit();<' + '/script>'
-	+ '</body></html>';
+    return cnt +
+	'</form><script>document.getElementById("form").submit();<' +
+	'/script></body></html>';
 }
 
 var testValues = {
-    "one form value":
-    [{fieldName: "first-field", body: "Field One Text"}], 
     "three form inputs": 
-    [{fieldName: "first-field", body: "Field One Text"},
-     {fieldName: "second-field", body: "Field Two Téxt"},
-     {fieldName: "third-field", body: "Field Three Téxt"}]
+    { testFields: [{fieldName: "first-field", body: "Field One Text"},
+		   {fieldName: "second-field", body: "Field Two Téxt"},
+		   {fieldName: "third-field", body: "Field Three Téxt"}]
+    },
+    "one form value":
+    { testFields: [{fieldName: "first-field", body: "Field One Text"}]
+    }
 };
 
-/// send files from the file system
-/// (file name may contain non-ascii characters)
+function testMatch(actual, testObj) {
+    assert_object_equals(actual, testObj.testFields, "form data matches expected");
+};
 
-var formFrame = document.getElementById("form-frame");
+var formAdd = document.getElementById("form-add");
+
+// set up event listener; events won't fire until form is populated
+
+function gotMessage (e) {
+    var response = JSON.parse(e.data);
+    var match = response.url.match(/[?]test=(.*)$/);
+    var foundTest = testValues[decodeURI(match[1])];
+    foundTest.asyncTest.step(function () {
+	testMatch(form_test.processResponse(response),
+		  foundTest);
+	});
+    foundTest.asyncTest.done();
+}
+
+window.addEventListener("message", gotMessage);
+
+var testObj;
+var testName;
+var formFrame;
+var test;
+var testSub;
 
 for (var testName in testValues) {
-    // nested function so each test is separate
-    (function testing () {
-	var test = async_test("Multipart/form-data test " + testName);
-	test.step(function () {
-	    var callback = null;
-	    function receiveMessage(e) {
-		var parsedParts = form_test.processResponse(JSON.parse(e.data));
-		assert_object_equals(parsedParts, 
-				     testValues[testName],
-				     "multipart test " + testName);
-		test.done();
-		// window.removeEventListener("message", callback);
-	    }
-	    callback = test.step_func(receiveMessage);
-	    window.addEventListener("message", callback);
-	    formFrame.srcdoc = generateFrameContent(testValues[testName]);
-	})
-	})()
-};
+    testObj = testValues[testName];
+    testObj.testName = testName;
+    formFrame = document.createElement("iframe");
+    formFrame.setAttribute("id", "form-" + testName);
+
+    formAdd.appendChild(formFrame);
+
+    test = async_test("Multipart/form-data test " + testName);
+    testSub = generateFrameContent(testObj);
+    testObj.asyncTest = test;
+    formFrame.srcdoc = testSub;
+}
+
     </script>
   </body>
 </html>
