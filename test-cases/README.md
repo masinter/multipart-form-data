@@ -18,7 +18,7 @@ To run this, you need [nodejs](http://nodejs.org/)
 
 1. CD to the test-cases directory
 2. Start the server with the following command: 
-	node node-server.js &
+	node echo-request.js &
 3. Launch the form-test.html file in a browser
 
 # How it works
@@ -27,11 +27,14 @@ To run this, you need [nodejs](http://nodejs.org/)
 * form-test.js contains a form-test specific shared library
 * the 'resources' files (testharness.js and testharnessreport.js) come from the W3C web platform test framework
 	https://github.com/w3c/testharness.js
-* node-server.js sets up a simple web server on port 8888
+* echo-request.js sets up a simple web server on port 8000
+  (alternatively, use echo-request.py python server)
 * form-test.html loads the form from sub-form-test.html into an iframe
 * The form auto-submits and sends its data, via POST, to node-server.js
 * node-server.js sends back a message containing a JSON object representing the request, including raw POST data it received
+
 * The async_test method from testharness.js is used to validate the data in the message
+
 * testharness.js outputs the results of the comparison to the div with id="log"
 
 

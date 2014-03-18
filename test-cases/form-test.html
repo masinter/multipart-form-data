@@ -1,4 +1,4 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <!-- -*- coding: utf-8 -*-  -->
 
 <html>
@@ -21,88 +21,31 @@ using the div with id="log".
 
   <body>
     <h2>Multipart-Form-Data Form Tests</h2>
-    <hr />
+    <hr >
 
     <div id="form-add">
     </div>
+
     <div id="log">
     Log goes here.
     </div>
     <hr />
     <script>
 
-var echoServer = 'http://localhost:8000/common/postecho.py';
-
-function generateFrameContent(td) {
-    var cnt = '<html>\n<head>\n<title>Form Test ' +
-	td.testName +
-	'</title>\n<meta charset=utf8></head>' +
-	'<body><h1>subframe ' + td.testName + '</h1>\n' +
-	'<form id="form" action="' +
-	echoServer + '?test=' +	td.testName +
-	'" method="POST" enctype="multipart/form-data">\n';
-    
-    td.testFields.forEach(function (obj) {
-	cnt += '<input type=text name="' + obj.fieldName + 
-	    '" value="' + obj.body + '">\n';
-    });
-
-    return cnt +
-	'</form><script>document.getElementById("form").submit();<' +
-	'/script></body></html>';
-}
-
 var testValues = {
-    "three form inputs": 
+    "simplest":
+    { testFields: [{fieldName: "first-field", body: "Field One Text"}] }
+    ,
+    "three-inputs": 
     { testFields: [{fieldName: "first-field", body: "Field One Text"},
-		   {fieldName: "second-field", body: "Field Two Téxt"},
-		   {fieldName: "third-field", body: "Field Three Téxt"}]
-    },
-    "one form value":
-    { testFields: [{fieldName: "first-field", body: "Field One Text"}]
-    }
-};
-
-function testMatch(actual, testObj) {
-    assert_object_equals(actual, testObj.testFields, "form data matches expected");
-};
-
-var formAdd = document.getElementById("form-add");
-
-// set up event listener; events won't fire until form is populated
-
-function gotMessage (e) {
-    var response = JSON.parse(e.data);
-    var match = response.url.match(/[?]test=(.*)$/);
-    var foundTest = testValues[decodeURI(match[1])];
-    foundTest.asyncTest.step(function () {
-	testMatch(form_test.processResponse(response),
-		  foundTest);
-	});
-    foundTest.asyncTest.done();
+   		   {fieldName: "second-field", body: "Field Two Téxt"},
+   		   {fieldName: "third-field", body: "Field Three Téxt"}] }
+    ,
+    "non-ascii-fieldname":
+    { testFields: [{fieldName: "first-fiéld", body: "First field"}] }
 }
 
-window.addEventListener("message", gotMessage);
-
-var testObj;
-var testName;
-var formFrame;
-var test;
-var testSub;
-
-for (var testName in testValues) {
-    testObj = testValues[testName];
-    testObj.testName = testName;
-    formFrame = document.createElement("iframe");
-    formFrame.setAttribute("id", "form-" + testName);
-
-    formAdd.appendChild(formFrame);
-
-    test = async_test("Multipart/form-data test " + testName);
-    testSub = generateFrameContent(testObj);
-    testObj.asyncTest = test;
-    formFrame.srcdoc = testSub;
-}
+doFormTests(testValues);
 
     </script>
   </body>
