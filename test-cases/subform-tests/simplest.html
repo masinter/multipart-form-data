@@ -3,11 +3,14 @@
 <title>Form Test simplest</title>
 <meta charset=utf8>
 <script>console.warn("in subform for test simplest");</script></head><body><h1>subframe simplest</h1>
+<div id="expect">
+{ testFields: [{fieldName: "first-field", body: "Field One Text"}] }
+</div>
+
 <form id="form" action="http://localhost:8000/common/echo-request.py?test=simplest" method="POST" enctype="multipart/form-data">
 <input type=text name="first-field" value="Field One Text">
 </form>
 <script>
-console.warn("submitting form for simplest");
-document.getElementById("form").submit();console.warn("submitted");</script>
+document.getElementById("form").submit();</script>
 </body></html>
 

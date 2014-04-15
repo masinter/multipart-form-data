@@ -2,7 +2,7 @@
 /*global assert_true, assert_equals, assert_greater_than, assert_object_equals, console, async_test */
 
 function doFormTests(testValues) {
-
+    
     function matchParams(orig, expectValue, expectParams, source) {
         var valueMatch = orig.match(new RegExp("^" + expectValue + "(;.*)$", "i"));
         assert_greater_than(valueMatch.length, 1, source + " should have " + expectValue);
@@ -83,6 +83,12 @@ function doFormTests(testValues) {
                                    "multipart/form-data", "boundary",
                                    "content-type header").boundary;
         
+	var ctl = eventObj.headers["content-length"];
+        var eol = eventObj.body.length;
+	if (ctl) {
+	    assert_greater_than(parseInt(ctl,10), eventObj.body.length-1,
+	    			"content-length matches");
+	}
         var raw = "(phoney preface)\r\n" + eventObj.body;
         var bodyParts = raw.split("\r\n--" + boundary + "\r\n");
         var bpl = bodyParts.length;
@@ -110,11 +116,11 @@ function doFormTests(testValues) {
     }
     
 
-    function setFrameContent(iframeDoc, content) {
-	iframeDoc.open('text/html', 'replace');
-	iframeDoc.write(content);
-	iframeDoc.close();
-    }
+    // function setFrameContent(iframeDoc, content) {
+    // 	iframeDoc.open('text/html', 'replace');
+    // 	iframeDoc.write(content);
+    // 	iframeDoc.close();
+    // }
 
     function testMatch(actual, testObj) {
         assert_object_equals(actual, testObj.testFields, "form data matches expected");
@@ -133,16 +139,22 @@ function doFormTests(testValues) {
 
     var echoServer = 'http://localhost:8000/common/echo-request.py';
 
-    function generateFrameContent(td) {
+    function generateFrameContent(td, responseID) {
         var cnt = '<!DOCTYPE html><html>\n<head>\n<title>Form Test ' +
             td.testName +
-            '</title>\n<meta charset=utf8>\n' + 
-            '<script>console.warn("in subform for test ' + td.testName + '");</' + 'script>' +
+            '</title>\n<meta charset=utf-8>\n' + 
+
+	    '<script>console.warn("in subform for test ' +  
+	    td.testName + '");</' + 'script>' +               
+
             '</head>' +
             '<body><h1>subframe ' + td.testName + '</h1>\n' +
+	    'Expected: <div id="expected">' + JSON.stringify(td) + '</div>\n' +
             '<form id="form" action="' +
             echoServer + '?test=' +     td.testName +
-            '" method="POST" enctype="multipart/form-data">\n';
+            '"' +
+	    (responseID? ' target="' + responseID + '"' : '') +
+	    ' method="POST" enctype="multipart/form-data">\n';
         
         td.testFields.forEach(function (obj) {
             cnt += '<input type=text name="' + obj.fieldName + 
@@ -151,27 +163,23 @@ function doFormTests(testValues) {
         
         return cnt +
             '</form>\n<script>\n' +
-            'console.warn("submitting form for ' + td.testName + '");\n' +
+            'console.warn("submitting form for ' + td.testName + '");\n' +  
             'document.getElementById("form").submit();' +
             'console.warn("submitted");' + 
             '<' + '/script>\n</body></html>';
     }
 
-    var testObj;
-    var testName;
-    var formFrame  = null;
-    var test;
-    var testSub;
-    var frameName;
+    var testObj, testName, formFrame  = null, responseName, responseFrame;
+    var test, testSub, frameName;
     
     var formAdd = document.getElementById("form-add");
 
     // set up event listener; events won't fire until form is populated
     if(window.addEventListener) {
-        console.warn("Event listener");
+        // console.warn("Event listener");
         window.addEventListener("message", gotMessage, false);
     } else {
-        console.warn("no addEventListener");
+        // console.warn("no addEventListener");
         window.onmessage(gotMessage);
     }
 
@@ -182,19 +190,25 @@ function doFormTests(testValues) {
             frameName = 'form-' + testName;
             formFrame = document.getElementById(frameName);
             if (! formFrame) {
-	        console.warn("making frame " + frameName);
                 formFrame = document.createElement("iframe");
                 formFrame.setAttribute("id", frameName);
 		// formFrame.setAttribute("sandbox", "allow-same-origin allow-top-navigation allow-forms allow-scripts");
                 formAdd.appendChild(formFrame);
             }
+	    //responseFrame = document.createElement("iframe");
+	    // responseName = "response-" + testName;
+	    // responseFrame.setAttribute("id", responseName);
+	    // formAdd.appendChild(responseFrame);
+
             test = async_test("Multipart/form-data test " + testName);
-	    test.step(function() {assert_true(true)});
-            testSub = generateFrameContent(testObj);
+	    // test.step(function() {assert_true(true)});
+
+            testSub = generateFrameContent(testObj, "");  // change empty to  responseName
             testObj.asyncTest = test;
             console.warn("generated " + testSub);
-            formFrame.srcdoc = testSub;
-	    formFrame.src = 'subform-tests/' + testName  + ".html";
+	    formFrame.srcdoc = testSub;
+	    // formFrame.src = "data:text/html;charset=utf8;base64," + Base64.encode(testSub);
+	    // formFrame.src = 'subform-tests/' + testName  + ".html";
         }
     }
 }

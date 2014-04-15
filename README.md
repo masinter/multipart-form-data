@@ -8,7 +8,7 @@ reference; it should be edited to match this new draft instead.
 
 
 Use xml2rfc to convert .xml file into .html and .txt
-	xml2rfc -f multpart-form-data.xml --text --html 
+    	xml2rfc multpart-form-data.xml --text --html 
 
 Periodically submit an Internet Draft
 	<https://datatracker.ietf.org/submit/>

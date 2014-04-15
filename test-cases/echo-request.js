@@ -34,7 +34,7 @@ http.createServer(function (request, response) {
 	
 	
 	// --- DEBUG ECHO IN HTML TOO --- 
-	var debug = 0;
+	var debug = 2;
 	if (0 < debug ) {
 	    response.write('<h2>Request data</h2><pre>');
 	    var ed = encodingData.split("\r\n");
@@ -43,8 +43,8 @@ http.createServer(function (request, response) {
 	    response.write(JSON.stringify(qReq, null, 2));
 	    response.write("\n\nBody:\n");
 	    for (var i=0; i<ed.length; i++) {
-		if (debug === 2) { console.log("\n  "+JSON.stringify(ed[i]).slice(1,-1)); }
-		response.write("\n  "+JSON.stringify(ed[i]).slice(1,-1));
+		if (debug === 2) { console.log("\n"+JSON.stringify(ed[i]).slice(1,-1)); }
+		response.write("\n"+JSON.stringify(ed[i]).slice(1,-1));
 	    }
 	    response.write('\n</pre>');
 	}

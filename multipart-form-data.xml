@@ -75,30 +75,35 @@
       <t>
 	However, multipart/form-data can be used for forms that are
 	presented using representations other than HTML (spreadsheets,
-	Portable Document Format, etc.), and for transport using other
-	means than electronic mail or HTTP. This document defines the
+	PDF, etc.), and for transport using
+	means  other than electronic mail or HTTP. This document defines the
 	representation of form values independently of the application
 	for which it is used.
       </t>
     </section>
-    <section title="Form requirements">
+    <section title="Advise for Forms and Form Processing">
       <t>
-	The representation and interpretation of forms is not
-	specified by this document, although some constraints
-        are imposed.
+	The representation and interpretation of forms and the nature
+	of form processing is not specified by this document.
+	However, for forms and form-processing that result in
+	generation of multipart/form-data, some suggestions are
+	included.
       </t>
       <t>
-	In a form, there are a series of fields to be supplied by the
+	In a form, there are a generally series of fields, where each
+	field is expected to be supplied with a value, e.g., by the
 	user who fills out the form.  Each field has a name.  After a
-	form has been filled out, when the user requests the form be
-	submitted (processes defined by the form), the result is a set
-	of values for each field-- the form-data.
+	form has been filled out, and the form's data is to be
+	'submitted', the form processing results in a set of values
+	for each field-- the "form data".
       </t>
       <t>
-	Field names are Unicode strings. Within a given
-	form, the field  names SHOULD be unique. Some fields
-        may have default values or presupplied values in the
-        form itself. Fields with presupplied values may be hidden.
+	In forms that work with multipart/form-data, field names are
+	Unicode strings, but restricting field names to ASCII avoids some
+	interoperability issues.  Within a given form, insuring field
+	names are unique is helpful.  Some fields may have default
+	values or presupplied values in the form itself. Fields with
+	presupplied values might be hidden or invisible.
       </t>
     </section>
     <section title='Definition of multipart/form-data'>
@@ -160,7 +165,7 @@
 	  <spanx style='code'>Content-Disposition</spanx> header.
 	  (The "SHOULD" is to allow file uploads that result from 
 	  drag-and-drop in systems where the file name is meaningless
-	  or private, where the uploaded> content is streamed directly
+	  or private, where the form data content is streamed directly
 	  from a device, or where the file name is not user visible
 	  and would be unrecognized.)
 	</t>
@@ -170,9 +175,10 @@
 	  of the <spanx style="verb">filename</spanx>
 	  parameter MUST be restricted to US-ASCII.
 	  File names normally visible to users which contain
-	  non-ASCII characters SHOULD
-	  be encoded using the &amp;#nn; method described in
-	  <xref target="amphash"/>. 
+	  non-ASCII characters SHOULD be encoded using the
+	  URL-encoding method in <xref target="percenthex"/>;
+	  this is generally the way that a "file:" URI would
+	  be encoded.
 	</t>
       </section>
 	  
@@ -195,7 +201,7 @@
 	  known, or <spanx style='verb'>application/octet-stream</spanx>.
 	</t>
       </section>
-      <section title="The charset parameter">
+      <section title="The text/plain charset parameter for text fields">
 	<t>
 	  In the case where a field value is text,
 	  the charset parameter for the <spanx style='verb'>text/plain</spanx>
@@ -217,12 +223,14 @@
       </section>
 	
       <section title="The _charset_ field">
-        <t>Forms have the convention that the value of a form entry
+        <t>Some form processing applications have the convention
+	that the value of a form entry
         with entry name <spanx style='verb'>_charset_</spanx>
 	and type <spanx style='verb'>hidden</spanx> is automatically
-        set to the name of the form-charset. In this case, the value
+        set; the value is then used as the default charset of
+	text field values (see form-charset in <xref target="form-charset" />).         In this case, the value
         of the default charset of each text/plain part without a
-        charset parameter is the supplied value. For example:</t>
+        charset parameter is set to the supplied value. For example:</t>
 	
 	<figure><artwork>
 	  --AaB03x
@@ -266,6 +274,17 @@
       </section>
     </section>
 	    
+    <section title="URL encoding non-ASCII values" anchor="percenthex">
+      <t>Within this specification, "URL-encoding"
+      is used for representing non-ASCII characters or those
+      that are not allowed in a context. The encoding is
+      created replacing each non-ASCII or disallowed character
+      with a sequence, where each byte of the UTF-8 encoding
+      of the character is represented by a percent-sign (%)
+      followed by the (lower case) hexadecimal of that byte.
+      </t>
+    </section>
+
     <section title="Operability considerations">
       <section title="Non-ASCII field names and values"
 	       anchor="non-ascii-fields">
@@ -277,26 +296,18 @@
 	  <xref target="RFC2047"/> if they contain characters outside
 	  of US-ASCII, practice varies.
 	</t>
-	<t>This specification makes three recommendations for
-	   three different states of workflow.</t>
+	<t>This specification makes three sets of recommendations 
+	for three different states of workflow.</t>
+
 	<section title="Avoid creating forms with non-ASCII field names">
           <t>For broadest interoperability with existing deployed
           software, those creating forms SHOULD avoid non-ASCII field
           names. This should not be a burden, because in general the
           field names are not visible to users.</t>
         </section>
-	<section title="Ampersand hash encoding" anchor="amphash">
-	  <t>Within this specification, the "ampersand hash encoding"
-	  is used for representing characters that are not allowed in
-	  a context: replace each disallowed character
-	  character by a string consisting of an ampersand
-	  (&amp;), a hash mark (#), one or more ASCII digits
-	  representing the Unicode code point of the character in base
-	  ten, and finally a semicolon (;).
-	  </t>
-	</section>
-
-	<section title="Interpreting forms and creating form-data">
+	
+	<section title="Interpreting forms and creating form-data"
+		 anchor="form-charset">
 	  <t>Some applications of this specification will supply a
 	  character encoding to be used for creation of the
 	  multipart/form-data result. In particular, <xref
@@ -309,8 +320,9 @@
 	    <t>otherwise UTF-8.</t>
 	  </list>
 	  Call this the form-charset. Any field name or
-	  file name which is not in US-ASCII must be encoded
-	  using the &amp;#nn; encoding in <xref target="amphash"/></t>
+	  file name which is not in US-ASCII MUST be encoded
+	  by the URL-encoding method in 
+	  <xref target="percenthex"/>.</t>
 	  <t>multipart/form-data parts which do not have
 	  a Content-Type header and which are not the result
 	  of supplying a local file MUST be transformed by
@@ -328,15 +340,23 @@
             encode multipart/form-data. For this reason the matching
             of form elements to form-data parts may rely on a fuzzier
             match.  In particular, some form-data generators might have
-            followed the advice of <xref target="RFC2388"/> and used
+            followed the previous advice of <xref target="RFC2388"/> and used
             the <xref target="RFC2047"/> "encoded-word" method of
             encoding non-ASCII values:
 	    <figure><artwork>
      encoded-word = "=?" charset "?" encoding "?" encoded-text "?=" 
 	    </artwork></figure>
-	    Others have been known to follow <xref target="RFC2231"/> 
-	    or to send unencoded UTF-8 or even unencoded strings
+	    Others have been known to follow <xref target="RFC2231"/>,
+	    to send unencoded UTF-8, or even unencoded strings
 	    in the form-charset.
+
+	  <!-- or to use a "HTML encoding" where non-ASCII characters
+	       are encoded using the HTML ampersand encoding, where
+	       each non-ASCII character is replaced with an ampersand
+	       (&amp;), a hash mark (#), one or more ASCII digits
+	       representing the Unicode code point of the character in
+	       base ten, followed by asemicolon (;).
+	    -->
 	  </t>
           <t>
 	    Generally, interpreting <spanx
@@ -344,7 +364,7 @@
 	    conforming generators) may require knowing the charset
 	    used in form encoding, in cases where the _charset_ field
 	    value or a charset parameter of a text/plain Content-Type
-	    header is not supplied.
+	    header is not supplied. (Note ).
           </t>
 	</section>
       </section>
@@ -353,7 +373,7 @@
 	  Form processors given forms with a
 	  well-defined ordering SHOULD send back results in the order
 	  received and preserve duplicate field names, in order.
-	  Intermediaries MUST NOT reorder the results.(Note that
+	  Intermediaries MUST NOT reorder the results. (Note that
 	  there are some forms which do not define a natural order
           of appearance.)
 	</t>
@@ -393,6 +413,12 @@
 	back to the form-data processor.)
       </t>
       </section>
+    </section>
+    <section title="IANA Considerations">
+      <t>
+	IANA please update the registration of multipart/form-data
+	to point to this document.
+      </t>
     </section>
     <section title="Security Considerations" anchor="security">
       <t>
@@ -527,8 +553,7 @@
       <t>
 	  The handling of non-ASCII field names changed-- no longer
 	  recommending the RFC 2047 method, instead requiring
-          UTF8.
-	  Few if any implemented the =?charset:string?= method
+	  URL encoding; few implemented the =?charset:string?= method
   of <xref target="RFC2047"/>.
 	</t>
 	
@@ -538,8 +563,9 @@
 	  element) results in each file having its own top level part with
 	  the same name parameter; the method of using a nested
 	  <spanx style='verb'>multipart/mixed</spanx>
-	  from <xref target="RFC2388"/> is not
-	  recommended.
+	  from <xref target="RFC2388"/> is no
+	  longer recommended for creators, and there are
+	  no known implementations of senders.
 	</t>
 	<t>
 	  The _charset_ convention and use of an explicit form-data
@@ -564,11 +590,11 @@
     </section>
 
     <section title="Alternatives">
+	
       <t>There are numerous alternative ways in which form data can be
-      encoded; many are listed in <xref target="RFC2388"/> under
-      "Other data encodings rather than multipart."  The
-      multipart/form-data encoding is verbose, especially if there are
-      many fields with short values. In most use cases, this
+      encoded; many are listed in <xref target="RFC2388"/> section
+      5.2.  The multipart/form-data encoding is verbose, especially if
+      there are many fields with short values. In most use cases, this
       overhead isn't significant. </t>
       <t>More problematic is the ambiguity introduced because
       implementations did not follow <xref target="RFC2388"/>
