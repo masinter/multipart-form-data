@@ -2,7 +2,7 @@
 /*global assert_true, assert_equals, assert_greater_than, assert_object_equals, console, async_test */
 
 function doFormTests(testValues) {
-    
+
     function matchParams(orig, expectValue, expectParams, source) {
         var valueMatch = orig.match(new RegExp("^" + expectValue + "(;.*)$", "i"));
         assert_greater_than(valueMatch.length, 1, source + " should have " + expectValue);
@@ -12,7 +12,7 @@ function doFormTests(testValues) {
         var params = {};
         var paramValue = "";
         var paramName = "";
-        
+
         orig = valueMatch[1];
         while (orig) {
             valueMatch = orig.match(new RegExp("^ *; *(" + expectParams + ") *= *([^ ;]*)", "i"));
@@ -36,11 +36,11 @@ function doFormTests(testValues) {
         var hv = {};
         var headerRegExp = /^([-a-z]+): (.*)\r\n/i;
         var headerParse = part.match(headerRegExp);
-        
+
         while (headerParse) {
             part = part.slice(headerParse[0].length);
             switch (headerParse[1].toLowerCase()) {
-                
+
             case 'content-disposition':
                 hv = matchParams(headerParse[2],
                                  "form-data",
@@ -51,24 +51,24 @@ function doFormTests(testValues) {
                     header.fileName  = hv.filename;
                 }
                 break;
-                
+
             case 'content-type':
                 header['content-type'] = headerParse[2];
                 break;
-                
+
             case 'content-transfer-encoding':
                 // TODO: validate
                 header['content-transfer-encoding'] = headerParse[2];
                 break;
-                
+
             default:
                 assert_true(false, "disallowed header: " + headerParse[1]);
                 break;
             }
-            
+
             headerParse = part.match(headerRegExp);
         }
-        
+
         header.body = part.slice(2);  // remove CRLF from what's left over
         return header;
     }
@@ -76,13 +76,13 @@ function doFormTests(testValues) {
     function processResponse(eventObj) {
         // assert_equals(eventObj.httpVersion, "1.1", "using HTTP/1.1");
         assert_equals(eventObj.method, "POST", "Method is POST");
-        
+
         var contentType = eventObj.headers["content-type"];
-        
+
         var boundary = matchParams(eventObj.headers["content-type"],
                                    "multipart/form-data", "boundary",
                                    "content-type header").boundary;
-        
+
 	var ctl = eventObj.headers["content-length"];
         var eol = eventObj.body.length;
 	if (ctl) {
@@ -92,42 +92,43 @@ function doFormTests(testValues) {
         var raw = "(phoney preface)\r\n" + eventObj.body;
         var bodyParts = raw.split("\r\n--" + boundary + "\r\n");
         var bpl = bodyParts.length;
-        
+
         assert_greater_than(bpl, 1, "must have at least one body part");
-        
+
         var lastPart = bodyParts[bpl-1];
         assert_greater_than(lastPart.length, 6 + boundary.length,
                             "last part is big enough");
         // should check for trailers!
-        
+
         var lastLine = lastPart.slice(lastPart.length-(boundary.length+8));
-        
-        assert_equals(lastLine, 
+
+        assert_equals(lastLine,
                       "\r\n--" + boundary + "--\r\n",
                       "multipart ends with boundary line");
-        
+
         bodyParts[bpl - 1] = lastPart.slice(0, -(boundary.length + 8));
-        var index, parsedParts = [];
+        var parsedParts = [];
         //start at 1, not 0
-        for (index = 1; index < bpl; index+=1) {
+        for (var index = 1; index < bpl; index+=1) {
             parsedParts.push(parsePart(bodyParts[index]));
         }
         return parsedParts;
     }
-    
 
-    // function setFrameContent(iframeDoc, content) {
-    // 	iframeDoc.open('text/html', 'replace');
-    // 	iframeDoc.write(content);
-    // 	iframeDoc.close();
-    // }
+
+    function setFrameContent(iframeDoc, content) {
+     	iframeDoc.open('text/html', 'replace');
+	iframeDoc.write(content);
+	iframeDoc.close();
+    }
 
     function testMatch(actual, testObj) {
         assert_object_equals(actual, testObj.testFields, "form data matches expected");
     }
     function gotMessage (e) {
         var response = JSON.parse(e.data);
-        var match = response.url.match(/[?]test=(.*)$/);
+        var match = response.url.match(/[?]op=echo&id=(.*)&data=(.*)$/);
+	assert_false(! match, "test harness error");
         var foundTest = testValues[decodeURI(match[1])];
         foundTest.asyncTest.step(function () {
             testMatch(processResponse(response),
@@ -135,51 +136,49 @@ function doFormTests(testValues) {
         });
         foundTest.asyncTest.done();
     }
-    
 
-    var echoServer = 'http://localhost:8000/common/echo-request.py';
+
+    var echoServer = 'http://localhost:8000/common/echo-request.js';
 
     function generateFrameContent(td, responseID) {
         var cnt = '<!DOCTYPE html><html>\n<head>\n<title>Form Test ' +
             td.testName +
-            '</title>\n<meta charset=utf-8>\n' + 
-
-	    '<script>console.warn("in subform for test ' +  
-	    td.testName + '");</' + 'script>' +               
-
+            '</title>\n<meta charset=utf-8>\n' +
+	    '<script>console.warn("in subform for test ' + td.testName + '");</' + 'script>' +
             '</head>' +
             '<body><h1>subframe ' + td.testName + '</h1>\n' +
-	    'Expected: <div id="expected">' + JSON.stringify(td) + '</div>\n' +
             '<form id="form" action="' +
-            echoServer + '?test=' +     td.testName +
+            echoServer + '?op=echo&id=' + td.testName + 
+	    '&data=' + 
+	    encodeURI(JSON.stringify(td)) +
             '"' +
 	    (responseID? ' target="' + responseID + '"' : '') +
 	    ' method="POST" enctype="multipart/form-data">\n';
-        
+
         td.testFields.forEach(function (obj) {
-            cnt += '<input type=text name="' + obj.fieldName + 
+            cnt += '<input type=text name="' + obj.fieldName +
                 '" value="' + obj.body + '">\n';
         });
-        
+
         return cnt +
             '</form>\n<script>\n' +
-            'console.warn("submitting form for ' + td.testName + '");\n' +  
+            'console.warn("submitting form for ' + td.testName + '");\n' +
             'document.getElementById("form").submit();' +
-            'console.warn("submitted");' + 
+            'console.warn("submitted");' +
             '<' + '/script>\n</body></html>';
     }
 
     var testObj, testName, formFrame  = null, responseName, responseFrame;
     var test, testSub, frameName;
-    
+
     var formAdd = document.getElementById("form-add");
 
     // set up event listener; events won't fire until form is populated
     if(window.addEventListener) {
-        // console.warn("Event listener");
+        console.warn("Event listener");
         window.addEventListener("message", gotMessage, false);
     } else {
-        // console.warn("no addEventListener");
+        console.warn("no addEventListener");
         window.onmessage(gotMessage);
     }
 
@@ -195,20 +194,22 @@ function doFormTests(testValues) {
 		// formFrame.setAttribute("sandbox", "allow-same-origin allow-top-navigation allow-forms allow-scripts");
                 formAdd.appendChild(formFrame);
             }
-	    //responseFrame = document.createElement("iframe");
+	    // responseFrame = document.createElement("iframe");
 	    // responseName = "response-" + testName;
 	    // responseFrame.setAttribute("id", responseName);
 	    // formAdd.appendChild(responseFrame);
 
             test = async_test("Multipart/form-data test " + testName);
-	    // test.step(function() {assert_true(true)});
+	    test.step(function() {assert_true(true)});
 
             testSub = generateFrameContent(testObj, "");  // change empty to  responseName
             testObj.asyncTest = test;
             console.warn("generated " + testSub);
-	    formFrame.srcdoc = testSub;
+	    // should tell server to write subform tests
+	    
+	    // formFrame.srcdoc = testSub;
 	    // formFrame.src = "data:text/html;charset=utf8;base64," + Base64.encode(testSub);
-	    // formFrame.src = 'subform-tests/' + testName  + ".html";
+	    formFrame.src = echoServer + '?op=get&id=' + testName + '&data=' + encodeURI(testSub);
         }
     }
 }
