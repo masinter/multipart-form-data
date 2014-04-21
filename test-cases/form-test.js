@@ -3,20 +3,30 @@
 
 function doFormTests(testValues) {
 
+    // match content-type parameters, e.g., after ; in boundary=
+    // orig = original header 
+
     function matchParams(orig, expectValue, expectParams, source) {
-        var valueMatch = orig.match(new RegExp("^" + expectValue + "(;.*)$", "i"));
-        assert_greater_than(valueMatch.length, 1, source + " should have " + expectValue);
+        var valueMatch = orig.match(new RegExp('^' + expectValue +
+					       '(;.*)$', 'i'));
+        assert_greater_than(valueMatch.length, 1, 
+			    source + " should have " + expectValue);
         if ((typeof expectParams) === 'array') {
             expectParams = expectParams.join("|");
         }
-        var params = {};
-        var paramValue = "";
-        var paramName = "";
-
+        var params = {}, paramValue = "", paramName = "", pattern = "";
+	
+	// ok, now work on parameters
         orig = valueMatch[1];
+
         while (orig) {
-            valueMatch = orig.match(new RegExp("^ *; *(" + expectParams + ") *= *([^ ;]*)", "i"));
-            assert_greater_than(valueMatch.length, 2, "properly formatted parameters");
+	    // while there's something left
+
+	    pattern = '^ *; *(' + expectParams + ')=("[^"]*"|[^;]*)' ;
+            valueMatch =  orig.match(new RegExp(pattern, 'i'));
+	    assert_true(!!valueMatch, "Parameter not found " + expectParams);
+            assert_greater_than(valueMatch.length, 2,
+				"properly formatted parameters");
             paramName = valueMatch[1];
             paramValue = valueMatch[2];
             if (paramValue.charAt(0) === '"') {
@@ -31,6 +41,7 @@ function doFormTests(testValues) {
         return params;
     }
 
+    // parse one of the parts of a multipart value
     function parsePart(part) {
         var header = {};
         var hv = {};
@@ -56,10 +67,12 @@ function doFormTests(testValues) {
                 header['content-type'] = headerParse[2];
                 break;
 
-            case 'content-transfer-encoding':
-                // TODO: validate
-                header['content-transfer-encoding'] = headerParse[2];
-                break;
+            // case 'content-transfer-encoding':
+            //     // TODO: validate CTE
+            //     header['content-transfer-encoding'] = headerParse[2];
+            //     break;
+		// do not allow CTE??
+
 
             default:
                 assert_true(false, "disallowed header: " + headerParse[1]);
@@ -87,7 +100,7 @@ function doFormTests(testValues) {
         var eol = eventObj.body.length;
 	if (ctl) {
 	    assert_greater_than(parseInt(ctl,10), eventObj.body.length-1,
-	    			"content-length matches");
+	                        "content-length matches");
 	}
         var raw = "(phoney preface)\r\n" + eventObj.body;
         var bodyParts = raw.split("\r\n--" + boundary + "\r\n");
@@ -107,28 +120,45 @@ function doFormTests(testValues) {
                       "multipart ends with boundary line");
 
         bodyParts[bpl - 1] = lastPart.slice(0, -(boundary.length + 8));
-        var parsedParts = [];
+        var index, parsedParts = [];
         //start at 1, not 0
-        for (var index = 1; index < bpl; index+=1) {
+        for (index = 1; index < bpl; index+=1) {
             parsedParts.push(parsePart(bodyParts[index]));
         }
         return parsedParts;
     }
 
 
-    function setFrameContent(iframeDoc, content) {
-     	iframeDoc.open('text/html', 'replace');
-	iframeDoc.write(content);
-	iframeDoc.close();
+    function testMatch(actual, testObj) {
+	var expected = testObj.testFields;
+	var aind = 0, eind = 0;
+
+	while(eind < expected.length) {
+	    if(expected[eind].multiple) {
+		while(aind < actual.length &&
+		      actual[aind].fieldName === expected[eind].fieldName) {
+		    // should check field names
+		    aind += 1;
+		}
+	    } else {
+		assert_greater_than(actual.length, aind, 
+				    "missing field: " +
+				    expected[eind].fieldName);
+		assert_equals(actual[aind].fieldName, expected[eind].fieldName,
+			      "field names match");
+		assert_equals(actual[aind].body, expected[eind].body,
+			      "field values match");
+		aind += 1; 
+	    }
+	    eind += 1;
+	}
+	assert_equals(aind, actual.length, "extra value");
     }
 
-    function testMatch(actual, testObj) {
-        assert_object_equals(actual, testObj.testFields, "form data matches expected");
-    }
     function gotMessage (e) {
         var response = JSON.parse(e.data);
-        var match = response.url.match(/[?]op=echo&id=(.*)&data=(.*)$/);
-	assert_false(! match, "test harness error");
+        var match = response.url.match(/[?]op=echo&id=(.*)&enc=(.*)&data=(.*)$/);
+	assert_true(!! match, "test harness error");
         var foundTest = testValues[decodeURI(match[1])];
         foundTest.asyncTest.step(function () {
             testMatch(processResponse(response),
@@ -138,7 +168,8 @@ function doFormTests(testValues) {
     }
 
 
-    var echoServer = 'http://localhost:8000/common/echo-request.js';
+    //54.187.112.177
+    var echoServer = 'http://localhost:8000/echo-request.js';
 
     function generateFrameContent(td, responseID) {
         var cnt = '<!DOCTYPE html><html>\n<head>\n<title>Form Test ' +
@@ -149,19 +180,27 @@ function doFormTests(testValues) {
             '<body><h1>subframe ' + td.testName + '</h1>\n' +
             '<form id="form" action="' +
             echoServer + '?op=echo&id=' + td.testName + 
+	    '&enc=' + (td.encoding || 'utf8' ) + 
 	    '&data=' + 
 	    encodeURI(JSON.stringify(td)) +
             '"' +
 	    (responseID? ' target="' + responseID + '"' : '') +
 	    ' method="POST" enctype="multipart/form-data">\n';
 
+
         td.testFields.forEach(function (obj) {
-            cnt += '<input type=text name="' + obj.fieldName +
+            cnt += '<input type=' + 
+		(obj.type || 'text')  + 
+		(obj.multiple ? ' multiple="multiple"' : '') +
+		' name="' + obj.fieldName +
                 '" value="' + obj.body + '">\n';
         });
-
+	if (td.manual) {
+	    return cnt + 'Press Submit\n<input type="submit">' +
+		'</form></body></html>';
+        }
         return cnt +
-            '</form>\n<script>\n' +
+	    '</form><script>\n' +
             'console.warn("submitting form for ' + td.testName + '");\n' +
             'document.getElementById("form").submit();' +
             'console.warn("submitted");' +
@@ -191,25 +230,33 @@ function doFormTests(testValues) {
             if (! formFrame) {
                 formFrame = document.createElement("iframe");
                 formFrame.setAttribute("id", frameName);
+
 		// formFrame.setAttribute("sandbox", "allow-same-origin allow-top-navigation allow-forms allow-scripts");
+
                 formAdd.appendChild(formFrame);
+		formAdd.appendChild(document.createElement("br"));
             }
 	    // responseFrame = document.createElement("iframe");
 	    // responseName = "response-" + testName;
 	    // responseFrame.setAttribute("id", responseName);
 	    // formAdd.appendChild(responseFrame);
 
-            test = async_test("Multipart/form-data test " + testName);
-	    test.step(function() {assert_true(true)});
+            test = async_test("Multipart/form-data test " + testName, 
+			      testObj.manual? {timeout: 600000} : null
+			     );
+	    // test.step(function() {assert_true(true)});
 
             testSub = generateFrameContent(testObj, "");  // change empty to  responseName
             testObj.asyncTest = test;
             console.warn("generated " + testSub);
-	    // should tell server to write subform tests
-	    
+
 	    // formFrame.srcdoc = testSub;
 	    // formFrame.src = "data:text/html;charset=utf8;base64," + Base64.encode(testSub);
-	    formFrame.src = echoServer + '?op=get&id=' + testName + '&data=' + encodeURI(testSub);
+
+	    var opEnc = testObj.encoding || 'utf8';
+            formFrame.src = echoServer + '?op=get&id=' + testName + 
+		'&enc=' + opEnc +
+		'&data=' + encodeURI(testSub);
         }
     }
 }
