@@ -9,7 +9,7 @@
     <script src="resources/testharnessreport.js"></script>
     <script src="form-test.js"></script>
     <style>
-      iframe {width: 95%;}
+      iframe {width: 49%;}
     </style>
   </head>
 
@@ -31,11 +31,18 @@ using the div with id="log".
     Log goes here.
     </div>
     <hr />
+
     <div id="form-add" >
+    <p>Form frames go here</p>
+    </div>
+    <hr />
+    <div id="warnings" >
+    <p>Warnings go here</p>
     </div>
     <script>
 
-var testValues = {
+doFormTests(
+{
     "simplest":
     { testFields: [{fieldName: "first-field", body: "Field One Text"}] }
     ,
@@ -49,20 +56,16 @@ var testValues = {
     ,
     "ask-for-files":
     { manual: true , 
-      testFields: [{fieldName: "first-field", body: "c:\\Users\\masinter\\home\\multipart-form-data\\test-cses\\files-for-uploading\\sample1.txt",
+      testFields: [{fieldName: "first-field", body: "c:\\Users\\masinter\\home\\multipart-form-data\\test-cases\\files-for-uploading\\sample1.txt",
                     type: "file", multiple: true}] }
-    // Need to use Iconv to handle other encodings
-    // ,
-    // "ask-files-8859-1" :
-    // { manual: true ,
-    //   encoding: 'iso8859-1' ,
-    //   testFields: [{fieldName: "first-field", body: "c:\\Users\\masinter\\home\\multipart-form-data\\test-cses\\files-for-uploading\\sample1.txt",
-    //                 type: "file", multiple: true}] }
+    ,
+    "ask-files-8859-1" :
+    { manual: true ,
+      encoding: 'iso8859-1' ,
+      testFields: [{fieldName: "first-field", body: "sample1.txt",
+                    type: "file", multiple: true}] }
 }
-
-
-doFormTests(testValues);
-
-    </script>
+);
+</script>
   </body>
 </html>
