@@ -1,79 +1,41 @@
 /*jslint indent: 4, node: true, sloppy: true, vars: true, white: true */
 
 var http = require('http');
+var fs = require('fs');
 var port = 8000;
 var iconv = require('iconv-lite');
 
-
-// Simple handler for form testing.
-//      query parammter op=<op>&id=<id>&data=<data>,
-//      op:   
-//         get:      given a test name, and some headers, returns the form
-//         echo:      echoed back the request to the parent.window
-
-
 http.createServer(function (request, response) {
-    // subset properties to ones that might be useful
+    var URLmatch, reqOp, reqID, reqEnc, reqData, qReq, reqType, index, prop;
+    var props = ["httpVersion", "headers", "trailers",
+		 "method", "url"];
 
-    var URLmatch =
-	request.url.match(/.*?op=(get|echo)&id=([-a-z0-9 ]*)&enc=([-a-z0-9]*)&data=(.*)$/);
 
-    if (!URLmatch) {
-	console.log("Error, bad URL: " + request.url);
-	response.writeHead(404, 'Error', {'Content-Type': 'text/html'});
-	response.write('<!DOCTYPE html><html><head><meta charset=utf-8>');
-	response.write('</head><body>');
-	response.write('<h2>Invalid Request</h2>' +
-		       '<p>Invalid request:</p>' +
-		       '<pre>' + request.url + '</pre></body></html>');
-	response.end();
-	return this;
-    }
-    var reqOp = URLmatch[1], reqID = URLmatch[2], reqEnc = URLmatch[3], reqData = URLmatch[4];
 
-    switch (reqOp) {
-
-	// get: return URL contents as HTML, encoded in given charset
-    case 'get':
-	response.writeHead(200, "OK", 
-			   {'Content-Type': 'text/html;charset=' + reqEnc,
-			    'Access-Control-Allow-Origin':'*',
-			    'X-XSS-Protection':'0'});
-	response.write(iconv.encode(decodeURIComponent(reqData), reqEnc));
-	response.end();
-	return this;
-
-	// echo: return request, as binary. reqEnc not used
-
-   case 'echo':
-	var qReq = {};
-        var index;
-	var props = ["httpVersion", "headers", "trailers",
-		     "method", "url"];
+    // <root>?echo=<id>&data=<data>
+    URLmatch = 	request.url.match(/.*\?echo=([-a-z.\/0-9 ]*)&data=(.*)$/);
+    if (URLmatch)  {
+	reqID = URLmatch[1]; reqData = URLmatch[2];
+	qReq = {};
 	for (index = 0; index < props.length; index++) {
-	    var prop = props[index];
+	    prop = props[index];
 	    qReq[prop] = request[prop];
 	}
-	
 	response.writeHead(200, "OK", {'Content-Type': 'text/html;charset=utf8',
 				       'Access-Control-Allow-Origin' : '*'});
-	
 	var encData = '';  // accumulate binary-encoded data
 	request.on('data', function(chunk) {
 	    encData += iconv.decode(chunk, 'binary');
 	});
-
 	request.on('end', function() {
 	    response.write('<!DOCTYPE html><html><head><meta charset=utf8></head><body>');
 	    qReq.body = encData;
-	    // this has the return from the submit then
 	    // pass a message to the parent
-	    // which is the actual form values, in 'binary' (not unicode)
+	    // which is the actual data stream, in 'binary' (not unicode)
 	    response.write('<script>window.parent.postMessage(JSON.stringify(' + 
 			   JSON.stringify(qReq) + 
 			   '), "*");\n</script>');
-	    
-	    var debug = 2;
+	    var debug = 1;
 	    if (0 < debug ) {
 		response.write('<h2>' + reqID + ' data</h2><pre>');
 		var ed = encData.split("\r\n");
@@ -94,9 +56,59 @@ http.createServer(function (request, response) {
 	    response.end();
 	});
 	return this;
-    default:
+    }
+
+    // <root>?convert=<id>&data=<data>
+    URLmatch = request.url.match(/.*\?convert=([-a-z0-9]*)&data=(.*)$/);
+    if(URLmatch) {
+	reqEnc = URLmatch[1]; reqData = URLmatch[2];
+	response.writeHead(200, "OK", 
+			   {'Content-Type': 'text/html;charset=' + reqEnc,
+			    'Access-Control-Allow-Origin':'*',
+			    'X-XSS-Protection':'0'});
+	response.write(iconv.encode(decodeURIComponent(reqData), reqEnc));
+	response.end();
 	return this;
     }
+
+    // ok, asking for a file
+    console.log("matching " + request.url);
+    URLmatch = request.url.match(/^\/(echo-request.js\?)?([-a-z0-9\/ ]*)\.([a-z0-9]*)$/);
+    if(URLmatch) {
+	reqID = URLmatch[2];
+	reqType = URLmatch[3]; 
+	var fileName =  reqID + "." + reqType;
+	console.log("sending " + fileName );
+	fs.readFile("./" + fileName,
+		    function(error, content) {
+			if (error) {
+			    response.writeHead(500);
+			    response.end();
+			}
+			else {
+			    reqEnc = {js: 'text/javascript',
+				      html: 'text/html',
+				      pdf: 'application/pdf',
+				      jpg: 'image/jpeg', 
+				      css: 'text/css'}[reqType];
+			    response.writeHead(200, 
+					       { 'Content-Type': reqEnc });
+			    response.end(content, 'utf8');
+			}
+		    }
+		   );
+	return this;
+    }
+
+    console.log("Error, bad URL: " + request.url);
+    response.writeHead(404, 'Error', {'Content-Type': 'text/html'});
+    response.write('<!DOCTYPE html><html><head><meta charset=utf-8>');
+    response.write('</head><body>');
+    response.write('<h2>Invalid Request</h2>' +
+		   '<p>Invalid request:</p>' +
+		   '<pre>' + request.url + '</pre></body></html>');
+    response.end();
+    return this;
 }).listen(port);
 console.log('Server running on port ' + port);
 

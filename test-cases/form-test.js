@@ -173,7 +173,7 @@ function doFormTests(testValues) {
 
     function gotMessage (e) {
         var response = JSON.parse(e.data);
-        var match = response.url.match(/[?]op=echo&id=(.*)&enc=(.*)&data=(.*)$/);
+        var match = response.url.match(/\?echo=([-a-z.\/0-9 ]*)&data=(.*)$/);
 	assert_true(!! match, "test harness error");
         var foundTest = testValues[decodeURIComponent(match[1])];
         foundTest.asyncTest.step(function () {
@@ -193,8 +193,7 @@ function doFormTests(testValues) {
             '</head>' +
             '<body><h1>subframe ' + td.testName + ' (in ' + enc + ')</h1>\n' +
             '<form id="form" action="' +
-            echoServer + '?op=echo&id=' + td.testName + 
-	    '&enc=' + (td.encoding || 'utf8' ) + 
+            echoServer + '?echo=' + td.testName + 
 	    '&data=' + 
 	    encodeURIComponent(JSON.stringify(td)) +
             '"' +
@@ -264,10 +263,11 @@ function doFormTests(testValues) {
             testSub = generateFrameContent(testObj, responseName, opEnc);
             testObj.asyncTest = test;
 
+	    // alternatives don't use form charset
 	    // formFrame.srcdoc = testSub;
 	    // formFrame.src = "data:text/html;charset=utf8;base64," + Base64.encode(testSub);
-            formFrame.src = echoServer + '?op=get&id=' + testName + 
-		'&enc=' + opEnc +
+
+            formFrame.src = echoServer + '?convert=' + opEnc +
 		'&data=' + encodeURIComponent(testSub);
         }
     }
