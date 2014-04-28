@@ -64,7 +64,7 @@
 
 <h2>files test</h2>
 
-<form action="mailto:example.org"
+<form action="mailto:masinter@adobe.com"
       method="POST" enctype="multipart/form-data">
       <input type=file multiple="multiple" size=40 name="input files" />
       <input type=submit>
@@ -72,35 +72,35 @@
       
 <h2>Subtest A</h2>
 <p>ASCII-safe data: name=test, value=test</p>
-<form action="mailto:example.org" method="post" enctype="multipart/form-data">
+<form action="mailto:masinter@adobe.com" method="post" enctype="multipart/form-data">
  <input type=hidden name=test value=text>
  <input type=submit>
 </form>
 
 <h2>Subtest B1</h2>
 <p>Win1252-safe data in value: name=test value=t&eacute;xt</p>
-<form action="mailto:example.org" method="post" enctype="multipart/form-data">
+<form action="mailto:masinter@adobe.com" method="post" enctype="multipart/form-data">
  <input type=hidden name=test value=t&eacute;xt>
  <input type=submit>
 </form>
 
 <h2>Subtest B2</h2>
 <p>Win1252-safe data in name: name=t&eacute;st value=text</p>
-<form action="mailto:example.org" method="post" enctype="multipart/form-data">
+<form action="mailto:masinter@adobe.com" method="post" enctype="multipart/form-data">
  <input type=hidden name=t&eacute;st value=text>
  <input type=submit>
 </form>
 
 <h2>Subtest C1</h2>
 <p>Unicode-safe data in value: name=test value=text&amp;x263A;</p>
-<form action="mailto:example.org" method="post" enctype="multipart/form-data">
+<form action="mailto:masinter@adobe.com" method="post" enctype="multipart/form-data">
  <input type=hidden name=test value=text&#x263A;>
  <input type=submit>
 </form>
 
 <h2>Subtest C2</h2>
 <p>Unicode-safe data in value: name=test&amp;#x263a; value=text</p>
-<form action="mailto:example.org" method="post" enctype="multipart/form-data">
+<form action="mailto:masinter@adobe.com" method="post" enctype="multipart/form-data">
  <input type=hidden name=test&#x263A; value=text>
  <input type=submit>
 </form>

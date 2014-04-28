@@ -11,7 +11,7 @@
   <!ENTITY w3c.html5 PUBLIC '' 'reference.W3C.CR-html5-20121217.xml'>
 ]>
 
-<rfc ipr='trust200902' docName='draft-ietf-appsawg-multipart-form-data-02'
+<rfc ipr='trust200902' docName='draft-ietf-appsawg-multipart-form-data-03'
      obsoletes='2388' category='std'
      >
   <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
@@ -48,10 +48,10 @@
     <section title='NOTE'>
        <t>There is a GitHub repository for this draft at
       https://github.com/masinter/multipart-form-data along with an
-      issue tracker. This specification has been proposed as a work
+      issue tracker. This specification is a work
       item of the APPSAWG Applications Area working group,
-      apps-discuss@ietf.org. Please raise issues in the tracker, or
-      send to the apps-discuss list.</t>
+      apps-discuss@ietf.org. Please raise issues in the tracker, and/or
+       send to the apps-discuss list.</t>
     </section>
     <section title='Introduction'>
       <t>
@@ -71,14 +71,16 @@
 	via HTTP or electronic mail. This representation is widely
 	implemented in numerous web browsers and web servers.
       </t>
-      
       <t>
-	However, multipart/form-data can be used for forms that are
+	However, <spanx style='verb'>multipart/form-data</spanx> is used for forms that are
 	presented using representations other than HTML (spreadsheets,
-	PDF, etc.), and for transport using
-	means  other than electronic mail or HTTP. This document defines the
-	representation of form values independently of the application
-	for which it is used.
+	PDF, etc.), and for transport using means other than
+	electronic mail or HTTP; it is used in distributed
+	applications which do not involve forms at all, or do
+	not have users filling out the form. For this reason, this document defines a
+	general syntax and semantics independent of the application
+	for which it is used, with specific rules for web applications
+	noted in context.
       </t>
     </section>
     <section title="Advise for Forms and Form Processing">
@@ -108,24 +110,22 @@
     </section>
     <section title='Definition of multipart/form-data'>
       <t>
-	The media-type <spanx
-	style='verb'>multipart/form-data</spanx> generally follows the
-	model of multipart MIME data streams as described in <xref
-	target='RFC2046'/> Section 5.1, although common
-	implementations vary, as noted in this document.
+	The media-type <spanx style='verb'>multipart/form-data</spanx>
+	roughly follows the model of multipart MIME data streams as
+	described in <xref target='RFC2046'/> Section 5.1; changes are
+	noted in this document.
       </t>
 
       <t>
 	A <spanx style='verb'>multipart/form-data</spanx> body
-	contains a series of parts.
-	Each part MUST contain a <spanx
+	contains a series of parts.  Each part MUST contain a <spanx
 	style='verb'>Content-Disposition</spanx> header <xref
-	target='RFC1806'/> <xref
-	target='RFC2183'/> where the disposition type is <spanx
-	style='verb'>form-data</spanx>, and where the disposition
-	contains an (additional) parameter of <spanx
-	style='verb'>name</spanx>; the value of the parameter is the
-	original field name from the form (encoded, see <xref
+	target='RFC1806'/> <xref target='RFC2183'/> where the
+	disposition type is <spanx style='verb'>form-data</spanx>.
+	The Content-Disposition header also (optionally) contains an
+	additional parameter of <spanx style='verb'>name</spanx>; the
+	value of the parameter is the original field name from the
+	form (possibly encoded, see <xref
 	target='non-ascii-fields'/>).  For example, a part might
 	contain a header:
 
@@ -149,64 +149,82 @@
 	    multipart/form-data;boundary="-AaB03x"
 	  </artwork></figure>
 	</t>
-	<t>Note that many implementations do not quote the boundary
+	<t>Note that many sending implementations do not quote the boundary
 	parameter, e.g.,
 	<figure><artwork>
-	  multipart/form-data;boundary="-AaB03x"
+	  multipart/form-data;boundary=-AaB03x
 	</artwork></figure>
 	</t>
       </section>
       
       <section title="filename attribute">
 	<t>
-	  For form data that represents the content of a local file,
-	  a name for the file SHOULD be supplied as well, by using a
-	  <spanx style='code'>filename</spanx> parameter of the
-	  <spanx style='code'>Content-Disposition</spanx> header.
-	  (The "SHOULD" is to allow file uploads that result from 
-	  drag-and-drop in systems where the file name is meaningless
-	  or private, where the form data content is streamed directly
-	  from a device, or where the file name is not user visible
-	  and would be unrecognized.)
+	  For form data that represents the content of a local file, a
+	  name for the file SHOULD be supplied as well, by using a
+	  <spanx style='verb'>filename</spanx> parameter of the <spanx
+	  style='verb'>Content-Disposition</spanx> header.  A file
+	  name isn't mandatory; file uploads might result from
+	  selection or drag-and-drop even in systems where the file
+	  name is meaningless or private, where the form data content
+	  is streamed directly from a device, or where the file name
+	  is not user visible and would be unrecognized.)
 	</t>
-
 	<t>
-	  For compatibility with other multipart types, the value
-	  of the <spanx style="verb">filename</spanx>
-	  parameter MUST be restricted to US-ASCII.
-	  File names normally visible to users which contain
-	  non-ASCII characters SHOULD be encoded using the
-	  URL-encoding method in <xref target="percenthex"/>;
+	  In other multipart types, the MIME headers in
+	  each part are restricted to US-ASCII, and for
+	  compatibility with those systems, file names
+	  normally visible to users MAY be encoded (using
+	  the URL-encoding method in <xref target="percenthex"/>;
 	  this is generally the way that a "file:" URI would
 	  be encoded.
+	</t>
+	  <t>However, commonly deployed systems use
+	  multipart/form-data with file names directly encoded
+	  including octets outside the US-ASCII range. The
+	  encoding used for the file names is typically UTF-8,
+	  although HTML forms will use the charset associated
+	  with the form.
 	</t>
       </section>
 	  
       <section title="Multiple files for one form field">
+	<t>The form data for a form field might include
+	multiple files.</t>
+	<t>Previously, it was suggested that multiple files
+	 for a single form field could be transmitted using
+	 a nested multipart/mixed part.
+	</t>
 	<t>
-	  If the value of a form field is a set of files rather than a
-	  single file, that value MUST be transmitted by supplying
-	  each in a separate part, but all with the same 
-	  <spanx style='verb'>name</spanx> parameter. 
+	  To match widely deployed implementations, multiple files
+	  MUST be sent by supplying each file in a separate part, but
+	  all with the same <spanx style='verb'>name</spanx>
+	  parameter.
+	</t>
+	<t>
+	  Reciving applications intended for wide applicability (e.g.,
+	  multipart/form-data parsing libraries) SHOULD support
+	  the older method of nesting.
 	</t>
       </section>
 	
       <section title='Content-Type'>
 	<t>
-	  Each part has an (optional)
-	  <spanx style='verb'>Content-Type</spanx>, which defaults
-	  to <spanx style='verb'>text/plain</spanx>.
-	  If the contents of a file are to be sent,
-	  the file data is labeled with an appropriate media type, if
-	  known, or <spanx style='verb'>application/octet-stream</spanx>.
+	  Each part has an (optional) <spanx
+	  style='verb'>Content-Type</spanx>, which defaults to <spanx
+	  style='verb'>text/plain</spanx>.  If the contents of a file
+	  are to be sent, the file data SHOULD be labeled with an
+	  appropriate media type, if known, or <spanx
+	  style='verb'>application/octet-stream</spanx>.
 	</t>
       </section>
       <section title="The text/plain charset parameter for text fields">
+	<t>NOTE: The examples in this document should be in Unicode using new RFC rules.
+	Using quoted-printable is deprecated.
+	</t>
 	<t>
 	  In the case where a field value is text,
 	  the charset parameter for the <spanx style='verb'>text/plain</spanx>
-	  Content-Type
-	  may be used to indicate the character encoding used in that part.
+	  Content-Type MAY be used to indicate the character encoding used in that part.
 	  For example, a form with a text field in which a user typed
 	  "Joe owes &lt;eu&gt;100" where &lt;eu&gt; is the Euro symbol
 	  might have form data returned as:
@@ -220,17 +238,23 @@
 	  Joe owes =E2=82=AC100.
 	  --AaB03x
 	</artwork></figure>
+	<t>In practice, most widely deployed implementations do not
+	supply a charset parameter in each part, but, rather, they rely
+	on the notion of a "default charset" for a multipart/form-data
+	instance. Subsequent sections will explain how the default
+	charset is established. </t>
       </section>
 	
-      <section title="The _charset_ field">
-        <t>Some form processing applications have the convention
+      <section title="The _charset_ field for default charset">
+        <t>Some form processing applications (including HTML) have the convention
 	that the value of a form entry
         with entry name <spanx style='verb'>_charset_</spanx>
 	and type <spanx style='verb'>hidden</spanx> is automatically
-        set; the value is then used as the default charset of
-	text field values (see form-charset in <xref target="form-charset" />).         In this case, the value
-        of the default charset of each text/plain part without a
-        charset parameter is set to the supplied value. For example:</t>
+        set when the form is opened; the value is used as the default charset of
+	text field values (see form-charset in <xref target="form-charset" />).
+        In such cases, the value
+        of the default charset for each text/plain part without a
+        charset parameter is the supplied value. For example:</t>
 	
 	<figure><artwork>
 	  --AaB03x
@@ -242,42 +266,47 @@
 	  content-type: text/plain
 	  content-disposition: form-data; name="field1"
 	  
-	  abcdefghijklmnopqrstuvwxyz
+	  ...text encoded in iso-8859-1 ...
 	  AaB03x--
 	</artwork></figure>
 
       </section>
 
-      <section title="Content-Transfer-Encoding">
+      <section title="Content-Transfer-Encoding deprecated">
 	<t>
-	  When used in transports which do not allow
-	  arbitrary binary data, each part that cannot be represented
-	  within the transport SHOULD be encoded and the
-	  <spanx style='verb'>Content-Transfer-Encoding</spanx>
-	  header supplied in that part. 
+	  Previously, it was recommended that senders use a <spanx
+	  style='verb'>Content-Transfer-Encoding</spanx> encoding
+	  (such ss quoted-printable) for each non-ASCII part of a
+	  multipart/form-data body.  This recommendation is
+	  "deprecated": senders MUST NOT send any parts with a
+	  content-transfer-encoding header.  No deployed
+	  implementations that send such bodies have been discovered.
 
+<!-- 	  
 	  For example, some email transports use a 7BIT
 	  encoding. (See section 5 of <xref target="RFC2046"/> for
 	  more details.)
 	  
 	  When transferred via HTTP, Content-Transfer-Encoding
 	  the form-data values SHOULD NOT be used.
+ -->	  
 	</t>
       </section>
+	  
       <section title="Other Content- headers">
 	<t>The <spanx style='verb'>multipart/form-data</spanx>
 	media type does not support any
-	MIME headers in the parts other than Content-Type,
-	Content-Disposition, and (when appropriate),
-	Content-Transfer-Encoding.
+	MIME headers in the parts other than Content-Type and
+	Content-Disposition. 
 	</t>
       </section>
     </section>
 	    
     <section title="URL encoding non-ASCII values" anchor="percenthex">
       <t>Within this specification, "URL-encoding"
-      is used for representing non-ASCII characters or those
-      that are not allowed in a context. The encoding is
+      is offered as a possible way of encoidng non-ASCII characters 
+      in file names.
+      The encoding is
       created replacing each non-ASCII or disallowed character
       with a sequence, where each byte of the UTF-8 encoding
       of the character is represented by a percent-sign (%)
@@ -289,36 +318,44 @@
       <section title="Non-ASCII field names and values"
 	       anchor="non-ascii-fields">
 	<t>
-	  MIME headers in multipart/form-data are required to consist
+	  Normally, MIME headers in multipart bodies are required to consist
 	  only of 7-bit data in the US-ASCII character set.
           While <xref target="RFC2388"/> suggested that non-ASCII
           field names should be encoded according to the method in
 	  <xref target="RFC2047"/> if they contain characters outside
-	  of US-ASCII, practice varies.
+	  of US-ASCII, this practice doesn't seem to have been followed
+	  widely.
 	</t>
 	<t>This specification makes three sets of recommendations 
 	for three different states of workflow.</t>
 
-	<section title="Avoid creating forms with non-ASCII field names">
+	<section title="Avoid creating forms or applications with non-ASCII field names">
           <t>For broadest interoperability with existing deployed
           software, those creating forms SHOULD avoid non-ASCII field
           names. This should not be a burden, because in general the
           field names are not visible to users.</t>
+	  <t>If non-ASCII field names are unavoidable, form
+	  or application creators SHOULD use UTF-8 uniformly.
+	  This will minimize interoperability problems.
+	  </t>
         </section>
 	
 	<section title="Interpreting forms and creating form-data"
 		 anchor="form-charset">
 	  <t>Some applications of this specification will supply a
-	  character encoding to be used for creation of the
-	  multipart/form-data result. In particular, <xref
+	  character encoding to be used for interpretation of the
+	  multipart/form-data body. In particular, <xref
 	  target="HTML5"/> uses:
-	  <list style='symbols'>
+	  <list style='numbers'>
+	    <t>The content of a '_charset_' field, if
+	    there is one.</t>
 	    <t>the value of an accept-charset attribute of
 	    the &lt;form&gt; element, if there is one,</t>
 	    <t>the character encoding of the document containing
 	    the form, if it is US-ASCII compatible,</t>
 	    <t>otherwise UTF-8.</t>
 	  </list>
+	  
 	  Call this the form-charset. Any field name or
 	  file name which is not in US-ASCII MUST be encoded
 	  by the URL-encoding method in 
@@ -335,9 +372,11 @@
             While this specification provides guidance for
 	    creation of multipart/form-data, interpreters of
 	    multipart/form-data should be aware of the variety
-	    of implementations. 
-	    Currently, deployed browsers differ as to how they
-            encode multipart/form-data. For this reason the matching
+	    of implementations. File systems differ as to
+	    whether and how they normalize Unicode names,
+	    for example.  
+	    <!-- 	    
+	    The mathis reason the matching
             of form elements to form-data parts may rely on a fuzzier
             match.  In particular, some form-data generators might have
             followed the previous advice of <xref target="RFC2388"/> and used
@@ -350,7 +389,7 @@
 	    to send unencoded UTF-8, or even unencoded strings
 	    in the form-charset.
 
-	  <!-- or to use a "HTML encoding" where non-ASCII characters
+	       or to use a "HTML encoding" where non-ASCII characters
 	       are encoded using the HTML ampersand encoding, where
 	       each non-ASCII character is replaced with an ampersand
 	       (&amp;), a hash mark (#), one or more ASCII digits
@@ -364,7 +403,7 @@
 	    conforming generators) may require knowing the charset
 	    used in form encoding, in cases where the _charset_ field
 	    value or a charset parameter of a text/plain Content-Type
-	    header is not supplied. (Note ).
+	    header is not supplied. 
           </t>
 	</section>
       </section>
@@ -552,9 +591,9 @@
     <section title="Changes from RFC 2388">
       <t>
 	  The handling of non-ASCII field names changed-- no longer
-	  recommending the RFC 2047 method, instead requiring
-	  URL encoding; few implemented the =?charset:string?= method
-  of <xref target="RFC2047"/>.
+	  recommending the RFC 2047 method, instead suggesting 
+	  senders send UTF-8 field names directly, and file names
+	  directly in the form-charset.
 	</t>
 	
 	<t>
@@ -564,7 +603,8 @@
 	  the same name parameter; the method of using a nested
 	  <spanx style='verb'>multipart/mixed</spanx>
 	  from <xref target="RFC2388"/> is no
-	  longer recommended for creators, and there are
+	  longer recommended for creators, and not required
+	  for recievers as there are
 	  no known implementations of senders.
 	</t>
 	<t>
@@ -575,7 +615,7 @@
 	'boundary' is a required parameter in Content-Type.
 	</t>
 	<t>
-	  The relationship of the ordering of fields within a form and
+	  The relationship of the ordeng of fields within a form and
 	  the ordering of returned values within multipart/form-data was
 	  not defined before, nor was the handling of the case where a
 	  form has multiple fields with the same name.

@@ -64,8 +64,13 @@ doFormTests(
       encoding: 'iso8859-1' ,
       testFields: [{fieldName: "first-field", body: "sample1.txt",
                     type: "file", multiple: true}] }
-}
-);
+    ,
+    "hx-001-c1" :
+    { encoding: 'win1252' ,
+      testFields: [{fieldName: "t&eacute;st1-name", body: "t&eacute;st1-body"} ,
+		   {fieldName: "t&x263A;st1-name", body: "t&x264A;st2-body"} 
+		  ] }
+});
 </script>
   </body>
 </html>
