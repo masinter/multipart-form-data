@@ -5,15 +5,28 @@ function doFormTests(testValues) {
 
     var formAdd = document.getElementById("form-add");
 
+
+    // UTILITIES	
+
+    // insert warning message in enclosing context
     function warnTest(msg) {
 	var warnPara = document.createElement("p");
 	warnPara.textContent = msg;
 	formAdd.appendChild(warnPara);
     }
+    // hack to encode non-ASCII characters
+    function encode_utf8(s) {
+	return unescape(encodeURIComponent(s));
+    }
 
-    // match content-type parameters, e.g., after ; in boundary=
-    // orig = original header 
-    function matchMIMEParams(orig, expectValue, expectParams, source) {
+
+
+    // match MIME header with parameters, e.g., after ; in boundary=
+    //    orig;          original content-type header
+    //    expectParams: regexp pattern or array of expected parameter names
+    //    expectValue:  regexp pattern of MIME header
+
+    function matchMIMEHeader(orig, expectValue, expectParams, source) {
         var valueMatch = orig.match(new RegExp('^' + expectValue +
 					       '(;.*)$', 'i'));
         assert_greater_than(valueMatch.length, 1, 
@@ -23,9 +36,7 @@ function doFormTests(testValues) {
         }
         var params = {}, paramValue = "", paramName = "", pattern = "";
 	
-	// ok, now work on parameters
         orig = valueMatch[1];
-
         while (orig) {
 	    pattern = '^ *; *(' + expectParams + ')=("[^"]*"|[^;]*)' ;
             valueMatch =  orig.match(new RegExp(pattern, 'i'));
@@ -52,58 +63,55 @@ function doFormTests(testValues) {
         var hv = {};
         var headerRegExp = /^([-a-z]+): (.*)\r\n/i;
         var headerParse = part.match(headerRegExp);
-
+	
         while (headerParse) {
             part = part.slice(headerParse[0].length);
             switch (headerParse[1].toLowerCase()) {
-
+		
             case 'content-disposition':
-                hv = matchMIMEParams(headerParse[2],
-                                 "form-data",
-                                 "name|filename",
-                                 "part's content-disposition header");
+                hv = matchMIMEHeader(headerParse[2],
+                                     "form-data",
+                                     "name|filename",
+                                     "part's content-disposition header");
                 header.fieldName = hv.name;
                 if (hv.hasOwnProperty("filename")) {
                     header.fileName  = hv.filename;
                 }
                 break;
-
+		
             case 'content-type':
                 header['content-type'] = headerParse[2];
                 break;
 
-            // case 'content-transfer-encoding':
-            //     // TODO: validate CTE
+	    // do not allow CTE??
+	    // case 'content-transfer-encoding':
             //     header['content-transfer-encoding'] = headerParse[2];
             //     break;
-		// do not allow CTE??
-
 
             default:
                 assert_true(false, "disallowed header: " + headerParse[1]);
                 break;
             }
-
             headerParse = part.match(headerRegExp);
         }
-
         header.body = part.slice(2);  // remove CRLF from what's left over
         return header;
     }
 
-    function processResponse(eventObj, testObj) {
-        // assert_equals(eventObj.httpVersion, "1.1", "using HTTP/1.1");
+    // parse and match response against expected values
+    function matchResponse(eventObj, testObj) {
         assert_equals(eventObj.method, "POST", "Method is POST");
 
         var contentType = eventObj.headers["content-type"];
 
-        var boundary = matchMIMEParams(eventObj.headers["content-type"],
+        var boundary = matchMIMEHeader(eventObj.headers["content-type"],
                                        "multipart/form-data", "boundary",
                                        "content-type header").boundary;
-
+	
 	var ctl = eventObj.headers["content-length"];
         var eol = eventObj.body.length;
 	if (ctl && (parseInt(ctl,10) !== eol)) {
+	    
 	    warnTest((testObj.testName || "") + 
 		     " WARNING: content length '" + ctl + "', actual: " + eol);
 	    // assert_equals(parseInt(ctl,10), eventObj.body.length,
@@ -126,6 +134,7 @@ function doFormTests(testValues) {
                       "\r\n--" + boundary + "--\r\n",
                       "multipart ends with boundary line");
 
+	// get rid of last boundary
         bodyParts[bpl - 1] = lastPart.slice(0, -(boundary.length + 8));
         var index, parsedParts = [];
         //start at 1, not 0
@@ -136,11 +145,7 @@ function doFormTests(testValues) {
     }
 
 
-    function encode_utf8(s) {
-	return unescape(encodeURIComponent(s));
-    }
-
-    function testMatch(actual, testObj) {
+    function matchFields(actual, testObj) {
 	var expected = testObj.testFields;
 	var aind = 0, eind = 0;
 	var eFieldName, eBody;
@@ -177,13 +182,14 @@ function doFormTests(testValues) {
 	assert_true(!! match, "test harness error");
         var foundTest = testValues[decodeURIComponent(match[1])];
         foundTest.asyncTest.step(function () {
-            testMatch(processResponse(response, foundTest),
-                      foundTest);
+            matchFields(matchResponse(response, foundTest),
+			foundTest);
         });
         foundTest.asyncTest.done();
     }
 
     //54.187.112.177
+
     var echoServer = 'http://localhost:8000/echo-request.js';
 
     function generateFrameContent(td, responseID, enc) {
@@ -202,12 +208,13 @@ function doFormTests(testValues) {
 
 
         td.testFields.forEach(function (obj) {
-            cnt += '<input type=' + 
+            cnt += obj.formInput ||  
+		'<input type=' + 
 		(obj.type || 'text')  + 
 		(obj.multiple ? ' multiple="multiple"' : '') +
 		' name="' + obj.fieldName +
                 '" value="' + obj.body + '">\n';
-        });
+	});
 	if (td.manual) {
 	    return cnt + 'Press Submit\n<input type="submit">' +
 		'</form></body></html>';
@@ -246,12 +253,13 @@ function doFormTests(testValues) {
             }
 	    responseName = "";
 	    // some browsers don't do targeting another frame
-	    if (false) {
-		responseFrame = document.createElement("iframe");
-		responseName = "response-" + testName;
-		responseFrame.setAttribute("id", responseName);
-		formAdd.appendChild(responseFrame);
-	    }
+	    // if (false) {
+	    // 	// window.navigator.userAgent.indexOf("Chrome/")
+	    // 	responseFrame = document.createElement("iframe");
+	    // 	responseName = "response-" + testName;
+	    // 	responseFrame.setAttribute("id", responseName);
+	    // 	formAdd.appendChild(responseFrame);
+	    // }
 
             test = async_test("Multipart/form-data test " + testName, 
 			      (testObj.manual? {timeout: 600000} : null)

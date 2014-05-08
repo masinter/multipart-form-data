@@ -67,8 +67,13 @@ doFormTests(
     ,
     "hx-001-c1" :
     { encoding: 'win1252' ,
-      testFields: [{fieldName: "t&eacute;st1-name", body: "t&eacute;st1-body"} ,
+      testFields: [{fieldName: "tést1-name", body: "tést1-body"},
 		   {fieldName: "t&x263A;st1-name", body: "t&x264A;st2-body"} 
+		  ] }
+    ,
+    "hx-000" :
+    { testFields: [{fieldName: "tést1-name", body: "tést1-body",
+                    formInput: '<input name="t&eacute;st1-name" value="t&eacute;st1-body">' } 
 		  ] }
 });
 </script>

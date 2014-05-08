@@ -1,8 +1,29 @@
 /*jslint indent: 4, node: true, sloppy: true, vars: true, white: true */
 
+// Run a HTTP server on port 8000
+// Three cases
+//   ECHO
+//   <root>?echo=<id>&data=<data>
+//       Echo back the entire request, including all data
+//       Result is a HTML file, which, when loaded, sends a message
+//       to the parent frame of JSON
+//       The <data> can be recovered from the UERL of the result
+//    CONVERT
+//    <root>?convert=<encoding>&data=<data>
+//        Convert <data> (URL-encoded UTF-8) to given encoding
+//    FILENAME
+//        Return contents of file, matching URL
+//          /echo-request?filename.ext or
+//          /filename
+//        only a few externsions supported, filenames no punctuation,
+//        lowercase only
+
+var port = 8000;
+var debug = 2;
+
+
 var http = require('http');
 var fs = require('fs');
-var port = 8000;
 var iconv = require('iconv-lite');
 
 http.createServer(function (request, response) {
@@ -12,6 +33,7 @@ http.createServer(function (request, response) {
 
 
 
+    // ECHO
     // <root>?echo=<id>&data=<data>
     URLmatch = 	request.url.match(/.*\?echo=([-a-z.\/0-9 ]*)&data=(.*)$/);
     if (URLmatch)  {
@@ -35,7 +57,6 @@ http.createServer(function (request, response) {
 	    response.write('<script>window.parent.postMessage(JSON.stringify(' + 
 			   JSON.stringify(qReq) + 
 			   '), "*");\n</script>');
-	    var debug = 1;
 	    if (0 < debug ) {
 		response.write('<h2>' + reqID + ' data</h2><pre>');
 		var ed = encData.split("\r\n");
@@ -58,7 +79,8 @@ http.createServer(function (request, response) {
 	return this;
     }
 
-    // <root>?convert=<id>&data=<data>
+    // CONVERT
+    // <root>?convert=<encoding>&data=<data>
     URLmatch = request.url.match(/.*\?convert=([-a-z0-9]*)&data=(.*)$/);
     if(URLmatch) {
 	reqEnc = URLmatch[1]; reqData = URLmatch[2];
@@ -71,14 +93,20 @@ http.createServer(function (request, response) {
 	return this;
     }
 
+    // 
     // ok, asking for a file
-    console.log("matching " + request.url);
+    if (0 < debug) { 
+	console.log("matching " + request.url);
+    }
+    // FILENAME
+    //  (either /filename.ext or /echo-request.js?filename.ext
+
     URLmatch = request.url.match(/^\/(echo-request.js\?)?([-a-z0-9\/ ]*)\.([a-z0-9]*)$/);
     if(URLmatch) {
 	reqID = URLmatch[2];
 	reqType = URLmatch[3]; 
 	var fileName =  reqID + "." + reqType;
-	console.log("sending " + fileName );
+	if (0 < debug) { console.log("sending " + fileName ); }
 	fs.readFile("./" + fileName,
 		    function(error, content) {
 			if (error) {
