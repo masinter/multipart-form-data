@@ -5,9 +5,11 @@
 # ignore output of md 
 README.html
 
-# ignore output of xml2rfc conversion
-multipart-form-data.txt
-multipart-form-data.html
-multipart-form-data.pdf
+# normally ignore output of xml2rfc conversion
+# turn off for now
+
+# multipart-form-data.txt
+# multipart-form-data.html
+# multipart-form-data.pdf
 
 
