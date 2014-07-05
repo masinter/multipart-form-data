@@ -11,7 +11,7 @@
   <!ENTITY w3c.html5 PUBLIC '' 'reference.W3C.CR-html5-20121217.xml'>
 ]>
 
-<rfc ipr='trust200902' docName='draft-ietf-appsawg-multipart-form-data-03'
+<rfc ipr='trust200902' docName='draft-ietf-appsawg-multipart-form-data-04'
      obsoletes='2388' category='std'
      >
   <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
@@ -143,17 +143,16 @@
 	  defined by the sending application and form, as a part of the
 	  multipart stream. The boundary is supplied as a "boundary"
 	  parameter to the multipart/form-data type, e.g.,
-      	</t>
-	<t>
 	  <figure><artwork>
 	    multipart/form-data;boundary="-AaB03x"
 	  </artwork></figure>
 	</t>
-	<t>Note that many sending implementations do not quote the boundary
-	parameter, e.g.,
-	<figure><artwork>
-	  multipart/form-data;boundary=-AaB03x
-	</artwork></figure>
+	<t>
+	  Note that many sending implementations do not quote the
+	  boundary parameter, e.g.,
+	  <figure><artwork>
+	    multipart/form-data;boundary=-AaB03x
+	  </artwork></figure>
 	</t>
       </section>
       
@@ -196,13 +195,13 @@
 	</t>
 	<t>
 	  To match widely deployed implementations, multiple files
-	  MUST be sent by supplying each file in a separate part, but
-	  all with the same <spanx style='verb'>name</spanx>
+	  SHOULD be sent by supplying each file in a separate part,
+	  but all with the same <spanx style='verb'>name</spanx>
 	  parameter.
 	</t>
 	<t>
 	  Reciving applications intended for wide applicability (e.g.,
-	  multipart/form-data parsing libraries) SHOULD support
+	  multipart/form-data parsing libraries) SHOULD also support
 	  the older method of nesting.
 	</t>
       </section>
@@ -218,9 +217,10 @@
 	</t>
       </section>
       <section title="The text/plain charset parameter for text fields">
-	<t>NOTE: The examples in this document should be in Unicode using new RFC rules.
-	Using quoted-printable is deprecated.
-	</t>
+
+	<t>NOTE: The examples in this document should be in Unicode
+	using new RFC rules, and the example re-written without
+	content-transfer-encoding, which is deprecated.</t>
 	<t>
 	  In the case where a field value is text,
 	  the charset parameter for the <spanx style='verb'>text/plain</spanx>
@@ -259,11 +259,9 @@
 	<figure><artwork>
 	  --AaB03x
 	  content-disposition: form-data; name="_charset_"
-	  content-type: text/plain
 	    
 	  iso8859-1
 	  --AaB03x--
-	  content-type: text/plain
 	  content-disposition: form-data; name="field1"
 	  
 	  ...text encoded in iso-8859-1 ...
@@ -272,32 +270,28 @@
 
       </section>
 
-      <section title="Content-Transfer-Encoding deprecated">
-	<t>
-	  Previously, it was recommended that senders use a <spanx
-	  style='verb'>Content-Transfer-Encoding</spanx> encoding
-	  (such ss quoted-printable) for each non-ASCII part of a
-	  multipart/form-data body.  This recommendation is
-	  "deprecated": senders MUST NOT send any parts with a
-	  content-transfer-encoding header.  No deployed
-	  implementations that send such bodies have been discovered.
+      <section title="Content-Transfer-Encoding deprecated"
+	       anchor='cte'>
+	<t>Previously, it was recommended that senders use a <spanx
+	style='verb'>Content-Transfer-Encoding</spanx> encoding (such
+	as <spanx style='verb'>quoted-printable</spanx>) for each
+	non-ASCII part of a multipart/form-data body, because that
+	would allow use in transports that only support a <spanx
+	style='verb'>7BIT</spanx> encoding. This use is deprecated for
+	use in contexts that support binary data such as HTTP: senders
+	SHOULD NOT generate any parts with a <spanx
+	style='verb'>Content-Transfer-Encoding</spanx> header.</t>
 
-<!-- 	  
-	  For example, some email transports use a 7BIT
-	  encoding. (See section 5 of <xref target="RFC2046"/> for
-	  more details.)
-	  
-	  When transferred via HTTP, Content-Transfer-Encoding
-	  the form-data values SHOULD NOT be used.
- -->	  
-	</t>
+	<t>Currently, no deployed implementations that send such
+	bodies have been discovered.</t>
+
       </section>
 	  
       <section title="Other Content- headers">
-	<t>The <spanx style='verb'>multipart/form-data</spanx>
-	media type does not support any
-	MIME headers in the parts other than Content-Type and
-	Content-Disposition. 
+	<t>The <spanx style='verb'>multipart/form-data</spanx> media
+	type does not support any MIME headers in the parts other than
+	Content-Type, Content-Disposition, and (in limited
+	circumstances) Content-Transfer-Encoding.
 	</t>
       </section>
     </section>
@@ -329,7 +323,7 @@
 	<t>This specification makes three sets of recommendations 
 	for three different states of workflow.</t>
 
-	<section title="Avoid creating forms or applications with non-ASCII field names">
+	<section title="Avoid non-ASCII field names">
           <t>For broadest interoperability with existing deployed
           software, those creating forms SHOULD avoid non-ASCII field
           names. This should not be a burden, because in general the
@@ -346,7 +340,7 @@
 	  character encoding to be used for interpretation of the
 	  multipart/form-data body. In particular, <xref
 	  target="HTML5"/> uses:
-	  <list style='numbers'>
+	  <list style='symbols'>
 	    <t>The content of a '_charset_' field, if
 	    there is one.</t>
 	    <t>the value of an accept-charset attribute of
@@ -504,17 +498,24 @@
 	  none
 	</t>
 	<t hangText='Encoding considerations:'>
-	  For use in transports that
-	  restrict the encoding to 7BIT or 8BIT, each part
-	  is encoded separately. 
+	  Common use is BINARY. 
+	  <vspace />
+	  In limited use (or transports that restrict the encoding to
+	  7BIT or 8BIT) each part is encoded separately using
+	  Content-Transfer-Encoding <xref target='cte'/>.
 	</t>
 	<t hangText='Security considerations:'>
-           Applications which receive forms and process them must be
-           careful not to supply data back to the requesting form
-           processing site that was not intended to be sent by the
-           recipient. This is a consideration for any application that
-           generates a multipart/form-data.
-	   See <xref target="security"/> of this document.
+          Applications which receive forms and process them must be
+          careful not to supply data back to the requesting form
+          processing site that was not intended to be sent by the
+          recipient. This is a consideration for any application that
+          generates a multipart/form-data.
+	  See <xref target="security"/> of this document.
+	</t>
+	<t hangText='Interoperability considerations:'>
+	  This document makes several recommendations for
+	  interoperability with deployed implementations, including
+	  <xref target='cte'/>.
 	</t>
       </list>
       </t>
