@@ -25,7 +25,7 @@ For example,
 	<http://tools.ietf.org/rfcdiff?url1=rfc2388&url2=draft-ietf-appsawg-multipart-form-data>
 will show you what's new in the latest internet draft.
 
-* [To HTML](http://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/masinter/multipart-form-data/master/pdfrfc.xml&modeAsFormat=html/ascii&type=ascii)
-* [To TEXT](http://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/masinter/multipart-form-data/master/pdfrfc.xml&modeAsFormat=txt/ascii&type=ascii)
+Quick way to run XML2RFC on head:
 
-* 
+* [To HTML](http://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/masinter/multipart-form-data/master/multipart-form-data.xml&modeAsFormat=html/ascii&type=ascii)
+* [To TEXT](http://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/masinter/multipart-form-data/master/multipart-form-data.xml&modeAsFormat=txt/ascii&type=ascii)
