@@ -4,9 +4,9 @@
 
 Network Working Group                                        L. Masinter
 Internet-Draft                                                     Adobe
-Obsoletes: 2388 (if approved)                               July 5, 2014
+Obsoletes: 2388 (if approved)                         September 13, 2014
 Intended status: Standards Track
-Expires: January 6, 2015
+Expires: March 17, 2015
 
 
             Returning Values from Forms: multipart/form-data
@@ -35,7 +35,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on January 6, 2015.
+   This Internet-Draft will expire on March 17, 2015.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Masinter                 Expires January 6, 2015                [Page 1]
+Masinter                 Expires March 17, 2015                 [Page 1]
 
-Internet-Draft             multipart/form-data                 July 2014
+Internet-Draft             multipart/form-data            September 2014
 
 
    the Trust Legal Provisions and are provided without warranty as
@@ -65,17 +65,18 @@ Table of Contents
 
    1.  NOTE  . . . . . . . . . . . . . . . . . . . . . . . . . . . .   2
    2.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
-   3.  Advise for Forms and Form Processing  . . . . . . . . . . . .   3
-   4.  Definition of multipart/form-data . . . . . . . . . . . . . .   4
-     4.1.  Boundary  . . . . . . . . . . . . . . . . . . . . . . . .   4
-     4.2.  filename attribute  . . . . . . . . . . . . . . . . . . .   4
-     4.3.  Multiple files for one form field . . . . . . . . . . . .   5
-     4.4.  Content-Type  . . . . . . . . . . . . . . . . . . . . . .   5
-     4.5.  The text/plain charset parameter for text fields  . . . .   5
-     4.6.  The _charset_ field for default charset . . . . . . . . .   6
-     4.7.  Content-Transfer-Encoding deprecated  . . . . . . . . . .   6
-     4.8.  Other Content- headers  . . . . . . . . . . . . . . . . .   7
-   5.  URL encoding non-ASCII values . . . . . . . . . . . . . . . .   7
+   3.  URL encoding non-ASCII values . . . . . . . . . . . . . . . .   3
+   4.  Advice for Forms and Form Processing  . . . . . . . . . . . .   3
+   5.  Definition of multipart/form-data . . . . . . . . . . . . . .   4
+     5.1.  Boundary parameter of multipart/form-data . . . . . . . .   4
+     5.2.  Content-Disposition header for each part  . . . . . . . .   4
+     5.3.  filename attribute of content-distribution part header  .   5
+     5.4.  Multiple files for one form field . . . . . . . . . . . .   5
+     5.5.  Content-Type header for each part . . . . . . . . . . . .   5
+     5.6.  The charset parameter for text/plain form data  . . . . .   6
+     5.7.  The _charset_ field for default charset . . . . . . . . .   6
+     5.8.  Content-Transfer-Encoding deprecated  . . . . . . . . . .   6
+     5.9.  Other Content- headers  . . . . . . . . . . . . . . . . .   7
    6.  Operability considerations  . . . . . . . . . . . . . . . . .   7
      6.1.  Non-ASCII field names and values  . . . . . . . . . . . .   7
        6.1.1.  Avoid non-ASCII field names . . . . . . . . . . . . .   7
@@ -96,11 +97,11 @@ Table of Contents
 
 1.  NOTE
 
-   There is a GitHub repository for this draft at
-   https://github.com/masinter/multipart-form-data along with an issue
-   tracker.  This specification is a work item of the APPSAWG
-   Applications Area working group, apps-discuss@ietf.org.  Please raise
-   issues in the tracker, and/or send to the apps-discuss list.
+   There is a GitHub repository for this draft at https://github.com/
+   masinter/multipart-form-data along with an issue tracker.  This
+   specification is a work item of the APPSAWG Applications Area working
+   group, apps-discuss@ietf.org.  Please raise issues in the tracker,
+   and/or send to the apps-discuss list.
 
 
 
@@ -108,10 +109,9 @@ Table of Contents
 
 
 
-
-Masinter                 Expires January 6, 2015                [Page 2]
+Masinter                 Expires March 17, 2015                 [Page 2]
 
-Internet-Draft             multipart/form-data                 July 2014
+Internet-Draft             multipart/form-data            September 2014
 
 
 2.  Introduction
@@ -124,21 +124,30 @@ Internet-Draft             multipart/form-data                 July 2014
 
    The definition of "multipart/form-data" is derived from one of those
    applications, originally set out in [RFC1867] and subsequently
-   incorporated into [HTML3.2] and [HTML4], where forms are expressed in
-   HTML, and in which the form values are sent via HTTP or electronic
-   mail.  This representation is widely implemented in numerous web
-   browsers and web servers.
+   incorporated into HTML 3.2 [W3C.REC-html32-19970114], where forms are
+   expressed in HTML, and in which the form data is sent via HTTP or
+   electronic mail.  This representation is widely implemented in
+   numerous web browsers and web servers.
 
-   However, "multipart/form-data" is used for forms that are presented
-   using representations other than HTML (spreadsheets, PDF, etc.), and
-   for transport using means other than electronic mail or HTTP; it is
-   used in distributed applications which do not involve forms at all,
-   or do not have users filling out the form.  For this reason, this
-   document defines a general syntax and semantics independent of the
-   application for which it is used, with specific rules for web
-   applications noted in context.
+   However, "multipart/form-data" is also used for forms that are
+   presented using representations other than HTML (spreadsheets, PDF,
+   etc.), and for transport using means other than electronic mail or
+   HTTP; it is used in distributed applications which do not involve
+   forms at all, or do not have users filling out the form.  For this
+   reason, this document defines a general syntax and semantics
+   independent of the application for which it is used, with specific
+   rules for web applications noted in context.
 
-3.  Advise for Forms and Form Processing
+3.  URL encoding non-ASCII values
+
+   Within this specification, "URL-encoding" is offered as a possible
+   way of encoding non-ASCII characters in file names.  The encoding is
+   created replacing each non-ASCII or disallowed character with a
+   sequence, where each byte of the UTF-8 encoding of the character is
+   represented by a percent-sign (%) followed by the (lower case)
+   hexadecimal of that byte.
+
+4.  Advice for Forms and Form Processing
 
    The representation and interpretation of forms and the nature of form
    processing is not specified by this document.  However, for forms and
@@ -146,100 +155,109 @@ Internet-Draft             multipart/form-data                 July 2014
    some suggestions are included.
 
    In a form, there are a generally series of fields, where each field
-   is expected to be supplied with a value, e.g., by the user who fills
+   is expected to be supplied with a value, e.g., by a user who fills
    out the form.  Each field has a name.  After a form has been filled
-   out, and the form's data is to be 'submitted', the form processing
-   results in a set of values for each field-- the "form data".
-
-   In forms that work with multipart/form-data, field names are Unicode
-   strings, but restricting field names to ASCII avoids some
-   interoperability issues.  Within a given form, insuring field names
-   are unique is helpful.  Some fields may have default values or
-   presupplied values in the form itself.  Fields with presupplied
-   values might be hidden or invisible.
+   out, and the form's data is "submitted": the form processing results
+   in a set of values for each field-- the "form data".
 
 
 
 
 
 
-
-
-Masinter                 Expires January 6, 2015                [Page 3]
+Masinter                 Expires March 17, 2015                 [Page 3]
 
-Internet-Draft             multipart/form-data                 July 2014
+Internet-Draft             multipart/form-data            September 2014
 
 
-4.  Definition of multipart/form-data
+   In forms that work with multipart/form-data, field names could be
+   arbitrary Unicode strings; however, restricting field names to ASCII
+   will help avoid some interoperability issues.
+
+   Within a given form, insuring field names are unique is also helpful.
+   Some fields may have default values or presupplied values in the form
+   itself.  Fields with presupplied values might be hidden or invisible;
+   this allows using generic processing for form data from a variety of
+   actual forms.
+
+5.  Definition of multipart/form-data
 
    The media-type "multipart/form-data" roughly follows the model of
    multipart MIME data streams as described in [RFC2046] Section 5.1;
    changes are noted in this document.
 
-   A "multipart/form-data" body contains a series of parts.  Each part
-   MUST contain a "Content-Disposition" header [RFC1806] [RFC2183] where
-   the disposition type is "form-data".  The Content-Disposition header
-   also (optionally) contains an additional parameter of "name"; the
-   value of the parameter is the original field name from the form
-   (possibly encoded, see Section 6.1).  For example, a part might
-   contain a header:
+   A "multipart/form-data" body contains a series of parts, separated by
+   a boundary.
 
-           Content-Disposition: form-data; name="user"
-
-   with the value corresponding to the entry of the "user" field.
-
-4.1.  Boundary
+5.1.  Boundary parameter of multipart/form-data
 
    As with other multipart types, the parts are delimited with a
-   boundary, selected such that it does not occur in any of the data.
-   Each field of the form is sent, in the order defined by the sending
-   application and form, as a part of the multipart stream.  The
-   boundary is supplied as a "boundary" parameter to the multipart/form-
-   data type, e.g.,
+   boundary, constructed using CRLF, "--", the value of the boundary
+   parameter, as per [RFC2046].  Each field's form data of the form is
+   sent, in the order defined by the sending application and form, as a
+   part of the multipart stream.  The boundary is supplied as a
+   "boundary" parameter to the "multipart/form-data type".  The boundary
+   MUST be selected such that it does not occur in any of the data.
+   e.g.,
 
            multipart/form-data;boundary="-AaB03x"
 
-   Note that many sending implementations do not quote the boundary
+   Note that a number of implementations do not quote the boundary
    parameter, e.g.,
 
            multipart/form-data;boundary=-AaB03x
 
-4.2.  filename attribute
+   and parsers should be prepared to acommodate.
+
+5.2.  Content-Disposition header for each part
+
+   Each part MUST contain a "content-disposition" header [RFC1806]
+   [RFC2183] where the disposition type is "form-data".  The "content-
+   disposition header" MUST also contain an additional parameter of
+   "name"; the value of the "name" parameter is the original field name
+   from the form (possibly encoded; see Section 6.1).  For example, a
+   part might contain a header:
+
+
+
+
+Masinter                 Expires March 17, 2015                 [Page 4]
+
+Internet-Draft             multipart/form-data            September 2014
+
+
+           Content-Disposition: form-data; name="user"
+
+   with the body of the part corresponding to the form data of the
+   "user" field.
+
+5.3.  filename attribute of content-distribution part header
 
    For form data that represents the content of a local file, a name for
    the file SHOULD be supplied as well, by using a "filename" parameter
-   of the "Content-Disposition" header.  A file name isn't mandatory;
+   of the "content-disposition" header.  A file name isn't mandatory;
    file uploads might result from selection or drag-and-drop even in
    systems where the file name is meaningless or private, where the form
    data content is streamed directly from a device, or where the file
    name is not user visible and would be unrecognized.)
 
-   In other multipart types, the MIME headers in each part are
-   restricted to US-ASCII, and for compatibility with those systems,
-   file names normally visible to users MAY be encoded (using the URL-
+   In most multipart types, the MIME headers in each part are restricted
+   to US-ASCII; for compatibility with those systems, file names
+   normally visible to users MAY be encoded (using the URL-encoding
+   method in Section 3; this is generally the way that a "file:" URI
+   would be encoded.
 
-
-
-
-Masinter                 Expires January 6, 2015                [Page 4]
-
-Internet-Draft             multipart/form-data                 July 2014
-
-
-   encoding method in Section 5; this is generally the way that a
-   "file:" URI would be encoded.
-
-   However, commonly deployed systems use multipart/form-data with file
+   Some commonly deployed systems use multipart/form-data with file
    names directly encoded including octets outside the US-ASCII range.
    The encoding used for the file names is typically UTF-8, although
    HTML forms will use the charset associated with the form.
 
-4.3.  Multiple files for one form field
+5.4.  Multiple files for one form field
 
    The form data for a form field might include multiple files.
 
-   Previously, it was suggested that multiple files for a single form
-   field could be transmitted using a nested multipart/mixed part.
+   [RFC2388] suggested that multiple files for a single form field be
+   transmitted using a nested multipart/mixed part.
 
    To match widely deployed implementations, multiple files SHOULD be
    sent by supplying each file in a separate part, but all with the same
@@ -247,40 +265,30 @@ Internet-Draft             multipart/form-data                 July 2014
 
    Reciving applications intended for wide applicability (e.g.,
    multipart/form-data parsing libraries) SHOULD also support the older
-   method of nesting.
+   method of supplying multiple files.
 
-4.4.  Content-Type
+5.5.  Content-Type header for each part
 
-   Each part has an (optional) "Content-Type", which defaults to "text/
-   plain".  If the contents of a file are to be sent, the file data
-   SHOULD be labeled with an appropriate media type, if known, or
+   Each part MAY have an (optional) "content-type", which defaults to
+   "text/plain".  If the contents of a file are to be sent, the file
+   data SHOULD be labeled with an appropriate media type, if known, or
    "application/octet-stream".
 
-4.5.  The text/plain charset parameter for text fields
 
-   NOTE: The examples in this document should be in Unicode using new
-   RFC rules, and the example re-written without content-transfer-
-   encoding, which is deprecated.
 
-   In the case where a field value is text, the charset parameter for
-   the "text/plain" Content-Type MAY be used to indicate the character
+
+Masinter                 Expires March 17, 2015                 [Page 5]
+
+Internet-Draft             multipart/form-data            September 2014
+
+
+5.6.  The charset parameter for text/plain form data
+
+   In the case where the form data text, the charset parameter for the
+   "text/plain" Content-Type MAY be used to indicate the character
    encoding used in that part.  For example, a form with a text field in
    which a user typed "Joe owes <eu>100" where <eu> is the Euro symbol
    might have form data returned as:
-
-
-
-
-
-
-
-
-
-
-Masinter                 Expires January 6, 2015                [Page 5]
-
-Internet-Draft             multipart/form-data                 July 2014
-
 
          --AaB03x
          content-disposition: form-data; name="field1"
@@ -290,13 +298,13 @@ Internet-Draft             multipart/form-data                 July 2014
          Joe owes =E2=82=AC100.
          --AaB03x
 
-   In practice, most widely deployed implementations do not supply a
+   In practice, many widely deployed implementations do not supply a
    charset parameter in each part, but, rather, they rely on the notion
    of a "default charset" for a multipart/form-data instance.
    Subsequent sections will explain how the default charset is
    established.
 
-4.6.  The _charset_ field for default charset
+5.7.  The _charset_ field for default charset
 
    Some form processing applications (including HTML) have the
    convention that the value of a form entry with entry name "_charset_"
@@ -316,42 +324,32 @@ Internet-Draft             multipart/form-data                 July 2014
          ...text encoded in iso-8859-1 ...
          AaB03x--
 
-4.7.  Content-Transfer-Encoding deprecated
+5.8.  Content-Transfer-Encoding deprecated
 
    Previously, it was recommended that senders use a "Content-Transfer-
    Encoding" encoding (such as "quoted-printable") for each non-ASCII
    part of a multipart/form-data body, because that would allow use in
    transports that only support a "7BIT" encoding.  This use is
-   deprecated for use in contexts that support binary data such as HTTP:
-   senders SHOULD NOT generate any parts with a "Content-Transfer-
+
+
+
+Masinter                 Expires March 17, 2015                 [Page 6]
+
+Internet-Draft             multipart/form-data            September 2014
+
+
+   deprecated for use in contexts that support binary data such as HTTP.
+   Senders SHOULD NOT generate any parts with a "Content-Transfer-
    Encoding" header.
 
    Currently, no deployed implementations that send such bodies have
    been discovered.
 
-
-
-
-
-Masinter                 Expires January 6, 2015                [Page 6]
-
-Internet-Draft             multipart/form-data                 July 2014
-
-
-4.8.  Other Content- headers
+5.9.  Other Content- headers
 
    The "multipart/form-data" media type does not support any MIME
    headers in the parts other than Content-Type, Content-Disposition,
    and (in limited circumstances) Content-Transfer-Encoding.
-
-5.  URL encoding non-ASCII values
-
-   Within this specification, "URL-encoding" is offered as a possible
-   way of encoidng non-ASCII characters in file names.  The encoding is
-   created replacing each non-ASCII or disallowed character with a
-   sequence, where each byte of the UTF-8 encoding of the character is
-   represented by a percent-sign (%) followed by the (lower case)
-   hexadecimal of that byte.
 
 6.  Operability considerations
 
@@ -381,40 +379,46 @@ Internet-Draft             multipart/form-data                 July 2014
 
    Some applications of this specification will supply a character
    encoding to be used for interpretation of the multipart/form-data
-   body.  In particular, [HTML5] uses:
+   body.  In particular, HTML 5 [W3C.CR-html5-20140731] uses:
 
    o  The content of a '_charset_' field, if there is one.
 
-
-
-
-
-Masinter                 Expires January 6, 2015                [Page 7]
-
-Internet-Draft             multipart/form-data                 July 2014
-
-
    o  the value of an accept-charset attribute of the <form> element, if
       there is one,
+
+
+
+
+Masinter                 Expires March 17, 2015                 [Page 7]
+
+Internet-Draft             multipart/form-data            September 2014
+
 
    o  the character encoding of the document containing the form, if it
       is US-ASCII compatible,
 
    o  otherwise UTF-8.
 
-   Call this the form-charset.  Any field name or file name which is not
-   in US-ASCII MUST be encoded by the URL-encoding method in Section 5.
-
-   multipart/form-data parts which do not have a Content-Type header and
-   which are not the result of supplying a local file MUST be
-   transformed by the same algorithm.
+   Call this value the form-charset.  Any text, whether field name,
+   field value, or (text/plain) form data which is uses characters
+   outside the ASCII range MAY be represented directly encoded in the
+   form-charset.
 
 6.1.3.  Parsing and interpreting form data
 
    While this specification provides guidance for creation of multipart/
-   form-data, interpreters of multipart/form-data should be aware of the
-   variety of implementations.  File systems differ as to whether and
-   how they normalize Unicode names, for example.
+   form-data, parsers and interpreters should be aware of the variety of
+   implementations.  File systems differ as to whether and how they
+   normalize Unicode names, for example.  The matching of form elements
+   to form-data parts may rely on a fuzzier match.  In particular, some
+   multipart/form-data generators might have followed the previous
+   advice of [RFC2388] and used the [RFC2047] "encoded-word" method of
+   encoding non-ASCII values:
+
+    encoded-word = "=?" charset "?" encoding "?" encoded-text "?="
+
+   Others have been known to follow [RFC2231], to send unencoded UTF-8,
+   or even unencoded strings in the form-charset.
 
    Generally, interpreting "multipart/form-data" (even from conforming
    generators) may require knowing the charset used in form encoding, in
@@ -439,19 +443,17 @@ Internet-Draft             multipart/form-data                 July 2014
    However, there is no opportunity to label the enclosed data with
    content type, apply a charset, or use other encoding mechanisms.
 
+
+
+Masinter                 Expires March 17, 2015                 [Page 8]
+
+Internet-Draft             multipart/form-data            September 2014
+
+
    Many form-interpreting programs (primarily web browsers) now
    implement and generate multipart/form-data, but an existing
-
-
-
-
-Masinter                 Expires January 6, 2015                [Page 8]
-
-Internet-Draft             multipart/form-data                 July 2014
-
-
-   application might need to optionally support both the application/x-
-   url-encoded format as well.
+   application might need to optionally support both the application/x
+   -url-encoded format as well.
 
 6.4.  Correlating form data with the original form
 
@@ -499,11 +501,9 @@ Internet-Draft             multipart/form-data                 July 2014
 
 
 
-
-
-Masinter                 Expires January 6, 2015                [Page 9]
+Masinter                 Expires March 17, 2015                 [Page 9]
 
-Internet-Draft             multipart/form-data                 July 2014
+Internet-Draft             multipart/form-data            September 2014
 
 
 9.  Media type registration for multipart/form-data
@@ -519,7 +519,7 @@ Internet-Draft             multipart/form-data                 July 2014
    Encoding considerations:  Common use is BINARY.
       In limited use (or transports that restrict the encoding to 7BIT
       or 8BIT) each part is encoded separately using Content-Transfer-
-      Encoding Section 4.7.
+      Encoding Section 5.8.
 
    Security considerations:  Applications which receive forms and
       process them must be careful not to supply data back to the
@@ -530,7 +530,7 @@ Internet-Draft             multipart/form-data                 July 2014
 
    Interoperability considerations:  This document makes several
       recommendations for interoperability with deployed
-      implementations, including Section 4.7.
+      implementations, including Section 5.8.
 
 10.  References
 
@@ -557,9 +557,9 @@ Internet-Draft             multipart/form-data                 July 2014
 
 
 
-Masinter                 Expires January 6, 2015               [Page 10]
+Masinter                 Expires March 17, 2015                [Page 10]
 
-Internet-Draft             multipart/form-data                 July 2014
+Internet-Draft             multipart/form-data            September 2014
 
 
    [RFC2231]  Freed, N. and K. Moore, "MIME Parameter Value and Encoded
@@ -569,26 +569,26 @@ Internet-Draft             multipart/form-data                 July 2014
 
 10.2.  Informative References
 
-   [HTML3.2]  Raggett, D., "HTML 3.2 Reference Specification", World
-              Wide Web Consortium Recommendation REC-html32-19970114,
-              January 1997, <http://www.w3.org/TR/REC-html32-19970114>.
-
-   [HTML4]    Raggett, D., Hors, A., and I. Jacobs, "HTML 4.0
-              Recommendation", World Wide Web Consortium REC-
-              html40-971218, December 1997,
-              <http://www.w3.org/TR/REC-html40-971218>.
-
-   [HTML5]    Berjon, R., Faulkner, S., Leithead, T., Navara, E.,
-              O'Connor, E., and S. Pfeiffer, "HTML5", September 2013,
-              <http://www.w3.org/html/wg/drafts/html/CR/>.
-
    [RFC1867]  Nebel, E. and L. Masinter, "Form-based File Upload in
               HTML", RFC 1867, November 1995.
 
    [RFC2388]  Masinter, L., "Returning Values from Forms: multipart/
               form-data", RFC 2388, August 1998.
 
+   [W3C.CR-html5-20140731]
+              Berjon, R., Faulkner, S., Leithead, T., Navara, E.,
+              O&#039;Connor, E., and S. Pfeiffer, "HTML5", World Wide
+              Web Consortium CR CR-html5-20140731, July 2014,
+              <http://www.w3.org/TR/2014/CR-html5-20140731>.
+
+   [W3C.REC-html32-19970114]
+              Raggett, D., "HTML 3.2 Reference Specification", World
+              Wide Web Consortium Recommendation REC-html32-19970114,
+              January 1997, <http://www.w3.org/TR/REC-html32-19970114>.
+
 Appendix A.  Changes from RFC 2388
+
+   Note that many implementations don't quote the boundary parameter.
 
    The handling of non-ASCII field names changed-- no longer
    recommending the RFC 2047 method, instead suggesting senders send
@@ -613,9 +613,9 @@ Appendix A.  Changes from RFC 2388
 
 
 
-Masinter                 Expires January 6, 2015               [Page 11]
+Masinter                 Expires March 17, 2015                [Page 11]
 
-Internet-Draft             multipart/form-data                 July 2014
+Internet-Draft             multipart/form-data            September 2014
 
 
    defined before, nor was the handling of the case where a form has
@@ -669,4 +669,4 @@ Author's Address
 
 
 
-Masinter                 Expires January 6, 2015               [Page 12]
+Masinter                 Expires March 17, 2015                [Page 12]

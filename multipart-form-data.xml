@@ -87,7 +87,7 @@
     </section>
     <section title="URL encoding non-ASCII values" anchor="percenthex">
       <t>Within this specification, "URL-encoding"
-      is offered as a possible way of encoidng non-ASCII characters 
+      is offered as a possible way of encoding non-ASCII characters 
       in file names.
       The encoding is
       created replacing each non-ASCII or disallowed character
