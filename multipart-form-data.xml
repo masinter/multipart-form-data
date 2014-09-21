@@ -12,7 +12,7 @@
   <!ENTITY w3c.html5  PUBLIC '' 'reference.W3C.CR-html5-20140731.xml'>
   ]>
   
-<rfc ipr='trust200902' docName='draft-ietf-appsawg-multipart-form-data-04'
+<rfc ipr='trust200902' docName='draft-ietf-appsawg-multipart-form-data-05'
      obsoletes='2388' category='std'
      >
   <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
@@ -108,7 +108,7 @@
       </t>
       <t>
 	In a form, there are a generally series of fields, where each
-	field is expected to be supplied with a value, e.g., by a user
+	field is expected to be supplied with a value, e.g. by a user
 	who fills out the form.  Each field has a name.  After a form
 	has been filled out, and the form's data is "submitted": the
 	form processing results in a set of values for each field--
@@ -149,7 +149,7 @@
 	  multipart stream. The boundary is supplied as a "boundary"
 	  parameter to the <spanx style='verb'>multipart/form-data
 	  type</spanx>.  The boundary MUST be selected such that it
-	  does not occur in any of the data.  e.g.,
+	  does not occur in any of the data.  e.g.
 
 	  <figure><artwork>
 	    multipart/form-data;boundary="-AaB03x"
@@ -158,7 +158,7 @@
 
 	<t>
 	  Note that a number of implementations do not quote the
-	  boundary parameter, e.g.,
+	  boundary parameter, e.g.
 
 	  <figure><artwork>
 	    multipart/form-data;boundary=-AaB03x
@@ -235,7 +235,7 @@
 	  parameter.
 	</t>
 	<t>
-	  Receiving applications intended for wide applicability (e.g.,
+	  Receiving applications intended for wide applicability (e.g.
 	  multipart/form-data parsing libraries) SHOULD also support
 	  the older method of supplying multiple files.
 	</t>
@@ -566,7 +566,7 @@
 	
 	<t>
 	  The handling of multiple files submitted as the result of a
-	  single form field (e.g., HTML's &lt;input type=file multiple&gt;
+	  single form field (e.g. HTML's &lt;input type=file multiple&gt;
 	  element) results in each file having its own top level part with
 	  the same name parameter; the method of using a nested
 	  <spanx style='verb'>multipart/mixed</spanx>
