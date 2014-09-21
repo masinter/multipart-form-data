@@ -3,12 +3,8 @@
 
 Update to RFC 2388, (Hopefully) to allow HTML5 to normatively reference it. 
 
-'HTML5-excerpt.html' started as an excerpt from the then-current HTML5
-reference; it should be edited to match this new draft instead.
-
-
 Use xml2rfc to convert .xml file into .html and .txt
-    	xml2rfc multipart-form-data.xml --text --html 
+    xml2rfc multipart-form-data.xml --text --html 
 
 Periodically submit an Internet Draft
 	<https://datatracker.ietf.org/submit/>
@@ -25,7 +21,8 @@ For example,
 	<http://tools.ietf.org/rfcdiff?url1=rfc2388&url2=draft-ietf-appsawg-multipart-form-data>
 will show you what's new in the latest internet draft.
 
-Quick way to run XML2RFC on head:
+The following links will convert the 'head' XML to HTML and plain text, by running the xml2rfc conversion on the raw github output:
 
 * [To HTML](http://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/masinter/multipart-form-data/master/multipart-form-data.xml&modeAsFormat=html/ascii&type=ascii)
+
 * [To TEXT](http://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/masinter/multipart-form-data/master/multipart-form-data.xml&modeAsFormat=txt/ascii&type=ascii)

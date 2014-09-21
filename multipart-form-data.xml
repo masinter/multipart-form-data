@@ -235,7 +235,7 @@
 	  parameter.
 	</t>
 	<t>
-	  Reciving applications intended for wide applicability (e.g.,
+	  Receiving applications intended for wide applicability (e.g.,
 	  multipart/form-data parsing libraries) SHOULD also support
 	  the older method of supplying multiple files.
 	</t>
@@ -572,7 +572,7 @@
 	  <spanx style='verb'>multipart/mixed</spanx>
 	  from <xref target="RFC2388"/> is no
 	  longer recommended for creators, and not required
-	  for recievers as there are
+	  for receivers as there are
 	  no known implementations of senders.
 	</t>
 	<t>
@@ -583,7 +583,7 @@
 	'boundary' is a required parameter in Content-Type.
 	</t>
 	<t>
-	  The relationship of the ordeng of fields within a form and
+	  The relationship of the ordering of fields within a form and
 	  the ordering of returned values within multipart/form-data was
 	  not defined before, nor was the handling of the case where a
 	  form has multiple fields with the same name.
