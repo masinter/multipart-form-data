@@ -9,7 +9,7 @@
   <!ENTITY rfc.2183 PUBLIC '' 'reference.RFC.2183.xml'>
   <!ENTITY rfc.2388 PUBLIC '' 'reference.RFC.2388.xml'>
   <!ENTITY w3c.html32 PUBLIC '' 'reference.W3C.REC-html32-19970114.xml'>
-  <!ENTITY w3c.html5  PUBLIC '' 'reference.W3C.PR-html5-20140916.xml'>
+  <!ENTITY w3c.html5  PUBLIC '' 'reference.W3C.REC-html5-20141028.xml'>
   ]>
   
 <rfc ipr='trust200902' docName='draft-ietf-appsawg-multipart-form-data-05'
@@ -366,7 +366,7 @@
 	  <t>Some applications of this specification will supply a
 	  character encoding to be used for interpretation of the
 	  multipart/form-data body. In particular, <xref
-	  target="W3C.PR-html5-20140916">HTML 5</xref> uses:
+	  target="W3C.REC-html5-20141028">HTML 5</xref> uses:
 	  <list style='symbols'>
 	    <t>The content of a '_charset_' field, if
 	    there is one.</t>
