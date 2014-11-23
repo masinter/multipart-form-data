@@ -4,7 +4,6 @@
   <!ENTITY rfc.2046 PUBLIC '' 'reference.RFC.2046.xml'>
   <!ENTITY rfc.2047 PUBLIC '' 'reference.RFC.2047.xml'>
   <!ENTITY rfc.2231 PUBLIC '' 'reference.RFC.2231.xml'>
-  <!ENTITY rfc.1806 PUBLIC '' 'reference.RFC.1806.xml'>
   <!ENTITY rfc.1867 PUBLIC '' 'reference.RFC.1867.xml'>
   <!ENTITY rfc.2183 PUBLIC '' 'reference.RFC.2183.xml'>
   <!ENTITY rfc.2388 PUBLIC '' 'reference.RFC.2388.xml'>
@@ -130,8 +129,8 @@
     <section title='Definition of multipart/form-data'>
       <t>
 	The media-type <spanx style='verb'>multipart/form-data</spanx>
-	roughly follows the model of multipart MIME data streams as
-	described in <xref target='RFC2046'/> Section 5.1; changes are
+	follows the model of multipart MIME data streams as
+	specified in <xref target='RFC2046'/> Section 5.1; changes are
 	noted in this document.
       </t>
       <t>
@@ -142,40 +141,26 @@
       <section title="Boundary parameter of multipart/form-data">
 	<t>
 	  As with other multipart types, the parts are delimited with
-	  a boundary, constructed using CRLF, "--", the value of the
-	  boundary parameter, as per <xref target='RFC2046'/>.  Each
+	  a boundary delimiter, constructed using CRLF, "--", the value of the
+	  boundary parameter.  Each
 	  field's form data of the form is sent, in the order defined
 	  by the sending application and form, as a part of the
 	  multipart stream. The boundary is supplied as a "boundary"
 	  parameter to the <spanx style='verb'>multipart/form-data
-	  type</spanx>.  The boundary MUST be selected such that it
-	  does not occur in any of the data.  e.g.
-
-	  <figure><artwork>
-	    multipart/form-data;boundary="-AaB03x"
-	  </artwork></figure>
-	</t>
-
-	<t>
-	  Note that a number of implementations do not quote the
-	  boundary parameter, e.g.
-
-	  <figure><artwork>
-	    multipart/form-data;boundary=-AaB03x
-	  </artwork></figure>
-	  
-	  and parsers should be prepared to acommodate.
+	  type</spanx>. As noted in <xref target='RFC2046'/> Section
+	  5.1, the boundary delimiter MUST NOT appear inside any
+	  of the encapsulated parts, and it is often necessary to
+	  enclose the boundary
+	  parameter values in quotes on the Content-type line.
 	</t>
       </section>
-      
       <section title='Content-Disposition header for each part'>
-
 	<t>
 	  Each part MUST contain a <spanx
-	  style='verb'>content-disposition</spanx> header <xref
-	  target='RFC1806'/> <xref target='RFC2183'/> where the
+	  style='verb'>content-disposition</spanx> header
+	  <xref target='RFC2183'/> where the
 	  disposition type is <spanx style='verb'>form-data</spanx>.
-	  The <spanx style='verb'>content-disposition header</spanx>
+	  The <spanx style='verb'>content-disposition</spanx> header
 	  MUST also contain an additional parameter of <spanx
 	  style='verb'>name</spanx>; the value of the <spanx
 	  style='verb'>name</spanx> parameter is the original field
@@ -327,7 +312,8 @@
 	<t>The <spanx style='verb'>multipart/form-data</spanx> media
 	type does not support any MIME headers in the parts other than
 	Content-Type, Content-Disposition, and (in limited
-	circumstances) Content-Transfer-Encoding.
+	circumstances) Content-Transfer-Encoding. Other headers
+	MUST NOT be included and MUST be ignored.
 	</t>
       </section>
     </section>
@@ -467,8 +453,12 @@
 
     <section title="IANA Considerations">
       <t>
-	IANA please update the registration of multipart/form-data
-	to point to this document.
+	Please update the Internet Media Type registration of
+	multipart/form-data to point to this document.
+	In addition, please update the registration of the "name"
+	parameter in the "Content Disposition Paramters" registry to
+	point to this document.
+
       </t>
     </section>
 
@@ -499,6 +489,11 @@
 	another address. Thus, additional caution is required
 	when executing automated scripting where form-data might
 	include a user's files.
+      </t>
+      <t>
+	Files sent via multipart/form-data may contain arbitrary
+	executable content, and precautions against malicious
+	content are necessary.
       </t>
     </section>
     <section title="Media type registration for multipart/form-data">
@@ -545,7 +540,6 @@
       &rfc.2046;
       &rfc.2047;
       &rfc.2231;
-      &rfc.1806;
       &rfc.2183;
       
     </references>
