@@ -398,10 +398,10 @@
 	  <t>
             Others have been known to follow
             <xref target="RFC2231"/>, to send unencoded UTF-8, or even
-            unencoded strings in the form-charset.
+            strings encoded in the form-charset.
 	  </t>
           <t>
-	    Generally, interpreting <spanx
+	    For this reason, interpreting <spanx
 	    style='verb'>multipart/form-data</spanx> (even from
 	    conforming generators) may require knowing the charset
 	    used in form encoding, in cases where the _charset_ field
