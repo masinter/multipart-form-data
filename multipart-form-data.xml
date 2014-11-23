@@ -7,8 +7,10 @@
   <!ENTITY rfc.1867 PUBLIC '' 'reference.RFC.1867.xml'>
   <!ENTITY rfc.2183 PUBLIC '' 'reference.RFC.2183.xml'>
   <!ENTITY rfc.2388 PUBLIC '' 'reference.RFC.2388.xml'>
+  <!ENTITY rfc.5987 PUBLIC '' 'reference.RFC.5987.xml'>
   <!ENTITY w3c.html32 PUBLIC '' 'reference.W3C.REC-html32-19970114.xml'>
   <!ENTITY w3c.html5  PUBLIC '' 'reference.W3C.REC-html5-20141028.xml'>
+
   ]>
   
 <rfc ipr='trust200902' docName='draft-ietf-appsawg-multipart-form-data-05'
@@ -106,7 +108,7 @@
 	included.
       </t>
       <t>
-	In a form, there are a generally series of fields, where each
+	In a form, there is generally a sequence of fields, where each
 	field is expected to be supplied with a value, e.g. by a user
 	who fills out the form.  Each field has a name.  After a form
 	has been filled out, and the form's data is "submitted": the
@@ -116,7 +118,8 @@
       <t>
 	In forms that work with multipart/form-data, field names could
 	be arbitrary Unicode strings; however, restricting field names
-	to ASCII will help avoid some interoperability issues.
+	to ASCII will help avoid some interoperability issues
+	(see <xref target='non-ascii-fields'/>). 
       </t>
       <t>
 	Within a given form, insuring field names are unique is also
@@ -158,7 +161,7 @@
 	<t>
 	  Each part MUST contain a <spanx
 	  style='verb'>content-disposition</spanx> header
-	  <xref target='RFC2183'/> where the
+	  <xref target='RFC2183'/> and where the
 	  disposition type is <spanx style='verb'>form-data</spanx>.
 	  The <spanx style='verb'>content-disposition</spanx> header
 	  MUST also contain an additional parameter of <spanx
@@ -179,7 +182,7 @@
 
       <section title="filename attribute of content-distribution part header">
 	<t>
-	  For form data that represents the content of a local file, a
+	  For form data that represents the content of a file, a
 	  name for the file SHOULD be supplied as well, by using a
 	  <spanx style='verb'>filename</spanx> parameter of the <spanx
 	  style='verb'>content-disposition</spanx> header.  A file
@@ -194,8 +197,12 @@
 	  restricted to US-ASCII; for compatibility with those
 	  systems, file names normally visible to users MAY be encoded
 	  (using the URL-encoding method in <xref
-	  target="percenthex"/>; this is generally the way that a
-	  "file:" URI would be encoded.
+	  target="percenthex"/>, such as how a "file:" URI might be encoded.
+	  
+	</t>
+	<t>NOTE: the method in <xref target="RFC5987"/> for using
+	a  "filename*" paramter of the "Content-Disposition" header
+	SHOULD NOT be used.
 	</t>
 	<t>
 	  Some commonly deployed systems use multipart/form-data with
@@ -239,7 +246,7 @@
       </section>
       <section title="The charset parameter for text/plain form data">
 	<t>
-	  In the case where the form data text, the charset parameter
+	  In the case where the form data is text, the charset parameter
 	  for the <spanx style='verb'>text/plain</spanx> Content-Type
 	  MAY be used to indicate the character encoding used in that
 	  part.  For example, a form with a text field in which a user
@@ -464,6 +471,11 @@
 
     <section title="Security Considerations" anchor="security">
       <t>
+	Applications which receive forms and process them must be
+        careful not to supply data back to the requesting form
+        processing site that was not intended to be sent.
+      </t>
+      <t>
 	It is important when interpreting the filename of the
 	Content-Disposition header to not overwrite files in the
 	recipient's file space inadvertently.
@@ -519,11 +531,6 @@
 	  Content-Transfer-Encoding <xref target='cte'/>.
 	</t>
 	<t hangText='Security considerations:'>
-          Applications which receive forms and process them must be
-          careful not to supply data back to the requesting form
-          processing site that was not intended to be sent by the
-          recipient. This is a consideration for any application that
-          generates a multipart/form-data.
 	  See <xref target="security"/> of this document.
 	</t>
 	<t hangText='Interoperability considerations:'>
@@ -546,19 +553,17 @@
     <references title="Informative References">
       &rfc.1867;
       &rfc.2388;
+      &rfc.5987;
       &w3c.html5;
       &w3c.html32;
     </references>
     <section title="Changes from RFC 2388">
-      <t>Note that many implementations don't quote the boundary parameter.
-      </t>
       <t>The handling of non-ASCII field names changed-- no longer
-	  recommending the RFC 2047 method, instead suggesting 
-	  senders send UTF-8 field names directly, and file names
-	  directly in the form-charset.
-	</t>
-	
-	<t>
+      recommending the RFC 2047 method, instead suggesting 
+      senders send UTF-8 field names directly, and file names
+      directly in the form-charset.
+      </t>
+      <t>
 	  The handling of multiple files submitted as the result of a
 	  single form field (e.g. HTML's &lt;input type=file multiple&gt;
 	  element) results in each file having its own top level part with
