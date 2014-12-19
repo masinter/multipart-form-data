@@ -45,16 +45,19 @@
       </t>
     </abstract>
 
-  </front>
-  <middle>
-    <section title='NOTE'>
+    <note title='Editorial Note (To be removed by RFC Editor before publication)'>
        <t>There is a GitHub repository for this draft at
-      https://github.com/masinter/multipart-form-data along with an
+      <eref target="https://github.com/masinter/multipart-form-data"/> along with an
       issue tracker. This specification is a work
       item of the APPSAWG Applications Area working group,
       apps-discuss@ietf.org. Please raise issues in the tracker, and/or
        send to the apps-discuss list.</t>
-    </section>
+    </note>
+
+    <area>Applications</area>
+    <workgroup>APPSAWG</workgroup>
+  </front>
+  <middle>
     <section title='Introduction'>
       <t>
 	In many applications, it is possible for a user to be
@@ -254,14 +257,14 @@
 	  symbol might have form data returned as:
 	</t>
 	<figure><artwork>
-	  --AaB03x
-	  content-disposition: form-data; name="field1"
-	  content-type: text/plain;charset=UTF-8
-	  content-transfer-encoding: quoted-printable
-	    
-	  Joe owes =E2=82=AC100.
-	  --AaB03x
-	</artwork></figure>
+    --AaB03x
+    content-disposition: form-data; name="field1"
+    content-type: text/plain;charset=UTF-8
+    content-transfer-encoding: quoted-printable
+      
+    Joe owes =E2=82=AC100.
+    --AaB03x
+</artwork></figure>
 
 
 	<t>In practice, many widely deployed implementations do not
@@ -282,18 +285,18 @@
         />).  In such cases, the value of the default charset for each
         text/plain part without a charset parameter is the supplied
         value. For example:</t>
-	
-	<figure><artwork>
-	  --AaB03x
-	  content-disposition: form-data; name="_charset_"
-	    
-	  iso8859-1
-	  --AaB03x--
-	  content-disposition: form-data; name="field1"
-	  
-	  ...text encoded in iso-8859-1 ...
-	  AaB03x--
-	</artwork></figure>
+  
+  <figure><artwork>
+    --AaB03x
+    content-disposition: form-data; name="_charset_"
+      
+    iso8859-1
+    --AaB03x--
+    content-disposition: form-data; name="field1"
+    
+    ...text encoded in iso-8859-1 ...
+    AaB03x--
+  </artwork></figure>
 
       </section>
 
@@ -428,7 +431,7 @@
 	</t>
 	<figure><artwork>
    name=Xavier+Xantico&amp;verdict=Yes&amp;colour=Blue&amp;happy=sad&amp;Utf%F6r=Send
-	</artwork></figure>
+</artwork></figure>
 	<t>
 	  However, there is no opportunity to label the enclosed
 	  data with content type, apply a charset, or use other
