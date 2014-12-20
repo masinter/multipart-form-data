@@ -44,7 +44,9 @@
 	filling out a form.  It replaces RFC 2388.
       </t>
     </abstract>
-
+    <area>Applications</area>
+    <workgroup>APPSAWG</workgroup>
+    
     <note title='Editorial Note (To be removed by RFC Editor before publication)'>
        <t>There is a GitHub repository for this draft at
       <eref target="https://github.com/masinter/multipart-form-data"/> along with an
@@ -54,8 +56,7 @@
        send to the apps-discuss list.</t>
     </note>
 
-    <area>Applications</area>
-    <workgroup>APPSAWG</workgroup>
+
   </front>
   <middle>
     <section title='Introduction'>
