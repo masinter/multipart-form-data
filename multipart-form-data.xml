@@ -35,6 +35,10 @@
       </address>
     </author>
     <date/>
+    
+    <area>Applications</area>
+    <workgroup>APPSAWG</workgroup>
+    
     <abstract>
       <t>
 	This specification (re)defines the multipart/form-data
@@ -44,9 +48,7 @@
 	filling out a form.  It replaces RFC 2388.
       </t>
     </abstract>
-    <area>Applications</area>
-    <workgroup>APPSAWG</workgroup>
-    
+
     <note title='Editorial Note (To be removed by RFC Editor before publication)'>
        <t>There is a GitHub repository for this draft at
       <eref target="https://github.com/masinter/multipart-form-data"/> along with an
