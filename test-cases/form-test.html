@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <!-- -*- coding: utf-8 -*-  -->
 
+<!-- see README in github for overview -->
+
 <html>
   <head>
     <meta charset="UTF-8">
@@ -40,6 +42,34 @@ using the div with id="log".
     <p>Warnings go here</p>
     </div>
     <script>
+
+<!-- here are the actual tests as a set of
+     named objects. "simplest" is the simplest
+     test, etc. 
+
+     Each test has attributes
+     manual:  true/false (default false)
+              Does the test require the test runner to 
+                select local files? Can't be automated.
+     testFields: An array of field objects
+     encoding: the ichar encoding which should be used
+         to encode the form. Useful for testing browser
+	 adherence to rule that default for _charset_
+	 and for x-url-encoded query parameters or POST
+	 body follow document charset.
+
+     a field object in a testField is an object with
+        fieldName: the name of the field
+        body:      the initital value of the field
+        formInput:  override the default input with
+                   an explicit HTML input string.
+        type:   field input type (defaults to text)
+        multiple:    true/false, should file input be
+	          tagged as accepting multiple files?
+
+
+-->
+
 
 doFormTests(
 {
