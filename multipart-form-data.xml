@@ -7,7 +7,10 @@
   <!ENTITY rfc.1867 PUBLIC '' 'reference.RFC.1867.xml'>
   <!ENTITY rfc.2183 PUBLIC '' 'reference.RFC.2183.xml'>
   <!ENTITY rfc.2388 PUBLIC '' 'reference.RFC.2388.xml'>
+  <!ENTITY rfc.3986 PUBLIC '' 'reference.RFC.3986.xml'>
   <!ENTITY rfc.5987 PUBLIC '' 'reference.RFC.5987.xml'>
+  <!ENTITY rfc.6838 PUBLIC '' 'reference.RFC.6838.xml'>
+  <!ENTITY I-D.file PUBLIC '' 'reference.I-D.draft-ietf-appsawg-file-scheme-00.xml'>
   <!ENTITY w3c.html32 PUBLIC '' 'reference.W3C.REC-html32-19970114.xml'>
   <!ENTITY w3c.html5  PUBLIC '' 'reference.W3C.REC-html5-20141028.xml'>
 
@@ -48,17 +51,6 @@
 	filling out a form.  It replaces RFC 2388.
       </t>
     </abstract>
-
-    <note title='Editorial Note (To be removed by RFC Editor before publication)'>
-       <t>There is a GitHub repository for this draft at
-      <eref target="https://github.com/masinter/multipart-form-data"/> along with an
-      issue tracker. This specification is a work
-      item of the APPSAWG Applications Area working group,
-      apps-discuss@ietf.org. Please raise issues in the tracker, and/or
-       send to the apps-discuss list.</t>
-    </note>
-
-
   </front>
   <middle>
     <section title='Introduction'>
@@ -92,15 +84,19 @@
 	web applications noted in context.
       </t>
     </section>
-    <section title="URL encoding non-ASCII values" anchor="percenthex">
-      <t>Within this specification, "URL-encoding"
-      is offered as a possible way of encoding non-ASCII characters 
-      in file names.
+    <section title="percent-encoding option" anchor="percenthex">
+      <t>Within this specification, "percent-encoding" (as defined
+      in <xref target="RFC3986"/>) 
+      is offered as a possible way of encoding 
+      characters in file names that are otherwise
+      disallowed, including non-ASCII characters, spaces,
+      control characters and so forth.
       The encoding is
       created replacing each non-ASCII or disallowed character
       with a sequence, where each byte of the UTF-8 encoding
       of the character is represented by a percent-sign (%)
-      followed by the (lower case) hexadecimal of that byte.
+      followed by the (case-insensitive) hexadecimal of that byte.
+      
       </t>
     </section>
 
@@ -151,12 +147,9 @@
 	<t>
 	  As with other multipart types, the parts are delimited with
 	  a boundary delimiter, constructed using CRLF, "--", the value of the
-	  boundary parameter.  Each
-	  field's form data of the form is sent, in the order defined
-	  by the sending application and form, as a part of the
-	  multipart stream. The boundary is supplied as a "boundary"
-	  parameter to the <spanx style='verb'>multipart/form-data
-	  type</spanx>. As noted in <xref target='RFC2046'/> Section
+	  boundary parameter.  The boundary is supplied as a "boundary"
+	  parameter to the <spanx style='verb'>multipart/form-data</spanx>
+	  type. As noted in <xref target='RFC2046'/> Section
 	  5.1, the boundary delimiter MUST NOT appear inside any
 	  of the encapsulated parts, and it is often necessary to
 	  enclose the boundary
@@ -181,7 +174,7 @@
         Content-Disposition: form-data; name="user"
       </artwork></figure>
 
-      with the body of the part corresponding to the form data of the 
+      with the body of the part containing the form data of the 
       <spanx style='verb'>user</spanx> field.
 	</t>
       </section>
@@ -191,25 +184,32 @@
 	  For form data that represents the content of a file, a
 	  name for the file SHOULD be supplied as well, by using a
 	  <spanx style='verb'>filename</spanx> parameter of the <spanx
-	  style='verb'>content-disposition</spanx> header.  A file
-	  name isn't mandatory; file uploads might result from
-	  selection or drag-and-drop even in systems where the file
-	  name is meaningless or private, where the form data content
-	  is streamed directly from a device, or where the file name
-	  is not user visible and would be unrecognized.)
+	  style='verb'>content-disposition</spanx> header.  The file
+	  name isn't mandatory for cases where the file name isn't
+	  available or is meaningless or private; this might result,
+	  for example, from 
+	  selection or drag-and-drop or where the form data content
+	  is streamed directly from a device. 
 	</t>
+	<t>If a filename parameter is supplied, the requirements
+	of <xref target="RFC2183"/> Section 2.3 for "receiving MUA"
+	apply to recievers of <spanx style='verb'>multipart/form-data</spanx>
+	as well: Do not use the file name blindly, check and
+	possibly change to match local filesystem conventions if
+	applicable, do not use directory path information that
+	may seesms to be present. </t>
 	<t>
 	  In most multipart types, the MIME headers in each part are
 	  restricted to US-ASCII; for compatibility with those
 	  systems, file names normally visible to users MAY be encoded
-	  (using the URL-encoding method in <xref
-	  target="percenthex"/>, such as how a "file:" URI might be encoded.
+	  using the percent-encoding method in <xref
+	  target="percenthex"/>, following how a "file:" URI <xref target="I-D.ietf-appsawg-file-scheme"/> might be encoded.
 	  
 	</t>
-	<t>NOTE: the method in <xref target="RFC5987"/> for using
-	a  "filename*" paramter of the "Content-Disposition" header
-	SHOULD NOT be used.
+	<t>NOTE: The encoding method described in <xref target="RFC5987"/>,
+	which would add a "filename*" paramter to the "Content-Disposition" header, MUST NOT be used. 
 	</t>
+
 	<t>
 	  Some commonly deployed systems use multipart/form-data with
 	  file names directly encoded including octets outside the
@@ -224,11 +224,12 @@
 	multiple files.</t>
 	<t><xref target='RFC2388'/> suggested that multiple files
 	for a single form field be transmitted using
-	 a nested multipart/mixed part.
+	a nested multipart/mixed part. This usage is
+	deprecated.
 	</t>
 	<t>
 	  To match widely deployed implementations, multiple files
-	  SHOULD be sent by supplying each file in a separate part,
+	  MUST be sent by supplying each file in a separate part,
 	  but all with the same <spanx style='verb'>name</spanx>
 	  parameter.
 	</t>
@@ -340,9 +341,8 @@
 	  Normally, MIME headers in multipart bodies are required to
 	  consist only of 7-bit data in the US-ASCII character set.
 	  While <xref target="RFC2388"/> suggested that non-ASCII
-	  field names should be encoded according to the method in
-	  <xref target="RFC2047"/> if they contain characters outside
-	  of US-ASCII, this practice doesn't seem to have been
+	  field names be encoded according to the method in
+	  <xref target="RFC2047"/>, this practice doesn't seem to have been
 	  followed widely.
 	</t>
 
@@ -353,7 +353,9 @@
           <t>For broadest interoperability with existing deployed
           software, those creating forms SHOULD avoid non-ASCII field
           names. This should not be a burden, because in general the
-          field names are not visible to users.</t>
+          field names are not visible to users. The field names
+	  in the underlying need not match what the user
+	  sees on the screen.</t>
 	  <t>If non-ASCII field names are unavoidable, form
 	  or application creators SHOULD use UTF-8 uniformly.
 	  This will minimize interoperability problems.
@@ -420,10 +422,12 @@
       <section title="Ordered fields and duplicated field names">
 	<t>
 	  Form processors given forms with a well-defined ordering
-	  SHOULD send back results in the order received and preserve
-	  duplicate field names, in order.  Intermediaries MUST NOT
-	  reorder the results. (Note that there are some forms which
-	  do not define a natural order of appearance.)
+	  SHOULD send back results in order (note that there
+	  are some forms which 	  do not define a natural order.)
+	  Intermediaries MUST NOT
+	  reorder the results.
+	  Form parts with identical field names MUST NOT
+	  be coalesced. 
 	</t>
       </section>	
       <section title="Interoperability with web applications">
@@ -467,10 +471,11 @@
     <section title="IANA Considerations">
       <t>
 	Please update the Internet Media Type registration of
-	multipart/form-data to point to this document.
+	multipart/form-data to point to this document, using
+	the template in <xref target='template'/>. 
 	In addition, please update the registration of the "name"
-	parameter in the "Content Disposition Paramters" registry to
-	point to this document.
+	parameter in the "Content Disposition Parameters" registry to
+	also point to this document.
 
       </t>
     </section>
@@ -514,21 +519,32 @@
 	content are necessary.
       </t>
       <t>
-      	All form processing software should treat user supplied form-data with 
-      	sensitivity, as it often contains confidential or personally identifying
-      	information.  Multipart/form-data does not supply any features for
-      	checking integrity, ensuring confidentiality or other security features;
-      	those concerns must be addressed by the form-filling and form-data-interpreting 
-      	applications.
+	The considerations of <xref target="RFC2183"/> Sections 2.3 and 5
+	with respect to the filename parameter of the Content-Disposition
+	header also apply to its usage here. 
+      </t>
+      <t>
+      	All form processing software should treat user supplied
+      	form-data with sensitivity, as it often contains confidential
+      	or personally identifying information. There is widespread use
+      	of form "auto-fill" features in web browsers; these might be
+      	used to trick users to unknowingly send confidential
+      	information when completing otherwise innoccuous tasks.
+      	Multipart/form-data does not supply any features for checking
+      	integrity, ensuring confidentiality, avoiding user confusion,
+      	or other security features; those concerns must be addressed
+      	by the form-filling and form-data-interpreting applications.
       </t>
     </section>
-    <section title="Media type registration for multipart/form-data">
+
+    <section title="Media type registration for multipart/form-data" anchor="template">
       <t>
+      This section is the <xref target="RFC6838"/> media type registration.
 	<list style='hanging'>
-	<t hangText='Media Type name:'>
+	<t hangText='Type name:'>
 	  multipart
 	</t>
-	<t hangText='Media subtype name:'>
+	<t hangText='Subtype name:'>
 	  form-data
 	</t>
 	<t hangText='Required parameters:'>
@@ -541,18 +557,51 @@
 	  Common use is BINARY. 
 	  <vspace />
 	  In limited use (or transports that restrict the encoding to
-	  7BIT or 8BIT) each part is encoded separately using
+	  7BIT or 8BIT each part is encoded separately using
 	  Content-Transfer-Encoding <xref target='cte'/>.
 	</t>
 	<t hangText='Security considerations:'>
 	  See <xref target="security"/> of this document.
 	</t>
+
 	<t hangText='Interoperability considerations:'>
 	  This document makes several recommendations for
 	  interoperability with deployed implementations, including
 	  <xref target='cte'/>.
 	</t>
-      </list>
+	<t hangText='Published specification:'>
+	  This document.
+	</t>
+	<t hangText='Applications that use this media type:'>
+	  Numerous web browsers, servers, and web applications.
+	</t>
+	<t hangText='Fragment identifier considerations:'>
+	  None: Fragment identifiers are not defined for this type.
+	</t>
+	<t hangText='Additional information:'>
+	  None: no deprecated alias names, magic numbers, file extensions
+	  or Macintosh ssssfile type codes.
+	</t>
+	<t hangText='Person &amp; email address to contact
+		     for further information'>
+	  Author of this document.
+	</t>
+	<t hangText='Intended Usage:'>
+	  COMMON
+	</t>
+	<t hangText='Restrictions on usage:'>
+	  none
+	</t>
+	<t hangText='Author:'>
+	  Author of this document.
+	</t>
+	<t hangText='Change controller:'>
+	  IETF
+	</t>
+	<t hangText='Provisional registration:'>
+	  N/A
+	</t>
+	</list>
       </t>
     </section>
   </middle>
@@ -562,12 +611,15 @@
       &rfc.2047;
       &rfc.2231;
       &rfc.2183;
+      &rfc.3986;
       
     </references>
     <references title="Informative References">
       &rfc.1867;
       &rfc.2388;
       &rfc.5987;
+      &rfc.6838;
+      &I-D.file;
       &w3c.html5;
       &w3c.html32;
     </references>
