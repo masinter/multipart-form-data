@@ -1,5 +1,6 @@
 <?xml version='1.0' ?>
 <!DOCTYPE rfc SYSTEM 'rfc2629.dtd' [
+  <!ENTITY rfc.2629 PUBLIC '' 'reference.RFC.2119.xml'>
   <!ENTITY rfc.2629 PUBLIC '' 'reference.RFC.2629.xml'>
   <!ENTITY rfc.2046 PUBLIC '' 'reference.RFC.2046.xml'>
   <!ENTITY rfc.2047 PUBLIC '' 'reference.RFC.2047.xml'>
@@ -16,7 +17,7 @@
 
   ]>
   
-<rfc ipr='trust200902' docName='draft-ietf-appsawg-multipart-form-data-08'
+<rfc ipr='trust200902' docName='draft-ietf-appsawg-multipart-form-data-09'
      obsoletes='2388' category='std'
      >
   <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
@@ -48,7 +49,7 @@
 	Internet Media Type, which can be used by a wide variety of
 	applications and transported by a wide variety of protocols as
 	a way of returning a set of values as the result of a user
-	filling out a form.  It replaces RFC 2388.
+	filling out a form.  It obsoletes RFC 2388.
       </t>
     </abstract>
   </front>
@@ -83,6 +84,12 @@
 	the application for which it is used, with specific rules for
 	web applications noted in context.
       </t>
+
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+      "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+      document are to be interpreted as described in BCP 14, RFC 2119 <xref
+      target="RFC2119"></xref>.</t>
+      
     </section>
     <section title="percent-encoding option" anchor="percenthex">
       <t>Within this specification, "percent-encoding" (as defined
@@ -124,7 +131,7 @@
 	(see <xref target='non-ascii-fields'/>). 
       </t>
       <t>
-	Within a given form, insuring field names are unique is also
+	Within a given form, ensuring field names are unique is also
 	helpful.  Some fields may have default values or presupplied
 	values in the form itself. Fields with presupplied values
 	might be hidden or invisible; this allows using generic
@@ -197,7 +204,7 @@
 	as well: Do not use the file name blindly, check and
 	possibly change to match local filesystem conventions if
 	applicable, do not use directory path information that
-	may seesms to be present. </t>
+	may seems to be present. </t>
 	<t>
 	  In most multipart types, the MIME headers in each part are
 	  restricted to US-ASCII; for compatibility with those
@@ -294,7 +301,7 @@
     --AaB03x
     content-disposition: form-data; name="_charset_"
       
-    iso8859-1
+    iso-8859-1
     --AaB03x--
     content-disposition: form-data; name="field1"
     
@@ -471,12 +478,11 @@
     <section title="IANA Considerations">
       <t>
 	Please update the Internet Media Type registration of
-	multipart/form-data to point to this document, using
-	the template in <xref target='template'/>. 
-	In addition, please update the registration of the "name"
-	parameter in the "Content Disposition Parameters" registry to
-	also point to this document.
-
+	multipart/form-data to point to this document, using the
+	template in <xref target='template'/>.  In addition, please
+	update the registrations of the "name" and "form-data"
+	parameters in the "Content Disposition Parameters" registry to
+	both point to this document.
       </t>
     </section>
 
@@ -607,6 +613,7 @@
   </middle>
   <back>
     <references title="Normative References">
+      &rfc.2119;
       &rfc.2046;
       &rfc.2047;
       &rfc.2231;
