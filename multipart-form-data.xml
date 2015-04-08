@@ -17,7 +17,7 @@
 
   ]>
   
-<rfc ipr='trust200902' docName='draft-ietf-appsawg-multipart-form-data-09'
+<rfc ipr='trust200902' docName='draft-ietf-appsawg-multipart-form-data-10'
      obsoletes='2388' category='std'
      >
   <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
@@ -488,6 +488,18 @@
 
     <section title="Security Considerations" anchor="security">
       <t>
+      	All form processing software should treat user supplied
+      	form-data with sensitivity, as it often contains confidential
+      	or personally identifying information. There is widespread use
+      	of form "auto-fill" features in web browsers; these might be
+      	used to trick users to unknowingly send confidential
+      	information when completing otherwise innoccuous tasks.
+      	Multipart/form-data does not supply any features for checking
+      	integrity, ensuring confidentiality, avoiding user confusion,
+      	or other security features; those concerns must be addressed
+      	by the form-filling and form-data-interpreting applications.
+      </t>
+      <t>
 	Applications which receive forms and process them must be
         careful not to supply data back to the requesting form
         processing site that was not intended to be sent.
@@ -528,18 +540,6 @@
 	The considerations of <xref target="RFC2183"/> Sections 2.3 and 5
 	with respect to the filename parameter of the Content-Disposition
 	header also apply to its usage here. 
-      </t>
-      <t>
-      	All form processing software should treat user supplied
-      	form-data with sensitivity, as it often contains confidential
-      	or personally identifying information. There is widespread use
-      	of form "auto-fill" features in web browsers; these might be
-      	used to trick users to unknowingly send confidential
-      	information when completing otherwise innoccuous tasks.
-      	Multipart/form-data does not supply any features for checking
-      	integrity, ensuring confidentiality, avoiding user confusion,
-      	or other security features; those concerns must be addressed
-      	by the form-filling and form-data-interpreting applications.
       </t>
     </section>
 
