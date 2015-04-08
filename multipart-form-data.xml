@@ -45,7 +45,7 @@
     
     <abstract>
       <t>
-	This specification (re)defines the multipart/form-data
+	This specification defines the multipart/form-data
 	Internet Media Type, which can be used by a wide variety of
 	applications and transported by a wide variety of protocols as
 	a way of returning a set of values as the result of a user
@@ -204,7 +204,7 @@
 	as well: Do not use the file name blindly, check and
 	possibly change to match local filesystem conventions if
 	applicable, do not use directory path information that
-	may seems to be present. </t>
+	may be present. </t>
 	<t>
 	  In most multipart types, the MIME headers in each part are
 	  restricted to US-ASCII; for compatibility with those
@@ -676,14 +676,18 @@
       5.2.  The multipart/form-data encoding is verbose, especially if
       there are many fields with short values. In most use cases, this
       overhead isn't significant. </t>
-      <t>More problematic is the ambiguity introduced because
-      implementations did not follow <xref target="RFC2388"/>
-      because it used "may" instead of "MUST" when specifying
-      encoding of field names, and for other unknown reasons,
-      so now, parsers need to be more complex for fuzzy matching
-      against the possible outputs of various encoding methods.
+
+      <t>More problematic are the differences introduced when
+      implementors opted to not follow <xref target="RFC2388"/> when
+      encoding non-ASCII field names (perhaps because "may" should
+      have been "MUST").  As a result, parsers need to be more complex
+      for matching against the possible outputs of various encoding
+      methods.
       </t>
     </section>
   </back>
 </rfc>
        
+
+
+
